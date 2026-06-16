@@ -1,5 +1,11 @@
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYBlML9RJCVicRvyy6lUGOzetEM5_CAeXU1jJh4DiSC_CirhJZGWmUyi0jpZHPti8l/exec';
 
+function ownerClass(owner) {
+  return String(owner || '')
+    .toLowerCase()
+    .trim();
+}
+
 let dashboardData = null;
 
 const FLAGS = {
