@@ -280,6 +280,15 @@ function matchCard(r) {
 }
 
 function renderTeams(rows) {
+  const records = buildTeamRecords(dashboardData?.games || []);
+
+  const sorted = [...rows].sort((a, b) =>
+    String(a.Group).localeCompare(String(b.Group)) ||
+    Number(b['Group Pts'] || 0) - Number(a['Group Pts'] || 0)
+  );
+
+  let previousGroup = '';
+
   document.getElementById('teams').innerHTML = `
     <table>
       <thead>
@@ -287,25 +296,65 @@ function renderTeams(rows) {
           <th>Team</th>
           <th>Owner</th>
           <th>Group</th>
+          <th>Record</th>
           <th>Group Pts</th>
           <th>Knockout Pts</th>
           <th>Total</th>
         </tr>
       </thead>
       <tbody>
-        ${rows.map(r => `
-          <tr class="${ownerClass(r.Owner)}">
-            <td>${flag(r.Team)} ${r.Team}</td>
-            <td>${r.Owner}</td>
-            <td>${r.Group}</td>
-            <td>${r['Group Pts'] || 0}</td>
-            <td>${r['Knockout Pts'] || 0}</td>
-            <td><strong>${r['Total Pts'] || 0}</strong></td>
-          </tr>
-        `).join('')}
+        ${sorted.map(r => {
+          const newGroup = r.Group !== previousGroup;
+          previousGroup = r.Group;
+
+          const rec = records[r.Team] || { w: 0, l: 0, d: 0 };
+
+          return `
+            <tr class="${ownerClass(r.Owner)} ${newGroup ? 'group-divider' : ''}">
+              <td>${flag(r.Team)} ${r.Team}</td>
+              <td>${r.Owner}</td>
+              <td><strong>${r.Group}</strong></td>
+              <td>${rec.w}-${rec.l}-${rec.d}</td>
+              <td>${r['Group Pts'] || 0}</td>
+              <td>${r['Knockout Pts'] || 0}</td>
+              <td><strong>${r['Total Pts'] || 0}</strong></td>
+            </tr>
+          `;
+        }).join('')}
       </tbody>
     </table>
   `;
+}
+
+function buildTeamRecords(games) {
+  const records = {};
+
+  games.forEach(g => {
+    if (!isCompleted(g)) return;
+
+    const t1 = g['Team 1'];
+    const t2 = g['Team 2'];
+    const s1 = Number(g['Score 1']);
+    const s2 = Number(g['Score 2']);
+
+    if (!t1 || !t2 || isNaN(s1) || isNaN(s2)) return;
+
+    records[t1] = records[t1] || { w: 0, l: 0, d: 0 };
+    records[t2] = records[t2] || { w: 0, l: 0, d: 0 };
+
+    if (s1 > s2) {
+      records[t1].w++;
+      records[t2].l++;
+    } else if (s2 > s1) {
+      records[t2].w++;
+      records[t1].l++;
+    } else {
+      records[t1].d++;
+      records[t2].d++;
+    }
+  });
+
+  return records;
 }
 
 function isCompleted(r) {
