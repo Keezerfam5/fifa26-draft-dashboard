@@ -96,7 +96,7 @@ function renderHighlights(data) {
       </div>
       <div class="highlight-card">
         <div class="label">Most Valuable Team</div>
-        <div class="big">${bestTeam ? `${flag(bestTeam.Team)} ${bestTeam.Team}` : '-'}</div>
+        <div class="big">${bestTeam ? flag(bestTeam.Team) + ' ' + bestTeam.Team : '-'}</div>
         <div>${bestTeam ? bestTeam.Owner + ' • ' + bestTeam['Total Pts'] + ' pts' : ''}</div>
       </div>
       <div class="highlight-card">
@@ -312,7 +312,7 @@ function hasScore(r) {
 }
 
 function teamWithFlag(team) {
-  return `${flag(team)} ${team}`;
+  return `${flag(team)} <span>${team}</span>`;
 }
 
 function groupBy(rows, key) {
