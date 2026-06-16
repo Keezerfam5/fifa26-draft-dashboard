@@ -390,4 +390,10 @@ function safe(value) {
 }
 
 document.getElementById('refreshBtn').addEventListener('click', () => loadData(true));
+
 loadData(false);
+
+// auto refresh every 5 minutes
+setInterval(() => {
+  loadData(false);
+}, 300000);
