@@ -1,7 +1,64 @@
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYBlML9RJCVicRvyy6lUGOzetEM5_CAeXU1jJh4DiSC_CirhJZGWmUyi0jpZHPti8l/exec';
 
+let dashboardData = null;
+
+const FLAGS = {
+  Mexico: '🇲🇽',
+  'South Africa': '🇿🇦',
+  'South Korea': '🇰🇷',
+  Czechia: '🇨🇿',
+  Canada: '🇨🇦',
+  Bosnia: '🇧🇦',
+  Qatar: '🇶🇦',
+  Switzerland: '🇨🇭',
+  Brazil: '🇧🇷',
+  Morocco: '🇲🇦',
+  Haiti: '🇭🇹',
+  Scotland: '🏴',
+  'United States': '🇺🇸',
+  Paraguay: '🇵🇾',
+  Australia: '🇦🇺',
+  Turkiye: '🇹🇷',
+  Germany: '🇩🇪',
+  Curacao: '🇨🇼',
+  'Ivory Coast': '🇨🇮',
+  Ecuador: '🇪🇨',
+  Netherlands: '🇳🇱',
+  Japan: '🇯🇵',
+  Sweden: '🇸🇪',
+  Tunisia: '🇹🇳',
+  Belgium: '🇧🇪',
+  Egypt: '🇪🇬',
+  Iran: '🇮🇷',
+  'New Zealand': '🇳🇿',
+  Spain: '🇪🇸',
+  'Cape Verde': '🇨🇻',
+  'Saudi Arabia': '🇸🇦',
+  Uruguay: '🇺🇾',
+  France: '🇫🇷',
+  Senegal: '🇸🇳',
+  Iraq: '🇮🇶',
+  Norway: '🇳🇴',
+  Argentina: '🇦🇷',
+  Algeria: '🇩🇿',
+  Austria: '🇦🇹',
+  Jordan: '🇯🇴',
+  Portugal: '🇵🇹',
+  Congo: '🇨🇩',
+  Uzbekistan: '🇺🇿',
+  Colombia: '🇨🇴',
+  England: '🏴',
+  Croatia: '🇭🇷',
+  Ghana: '🇬🇭',
+  Panama: '🇵🇦'
+};
+
 function ownerClass(owner) {
   return String(owner || '').toLowerCase();
+}
+
+function flag(team) {
+  return FLAGS[team] || '🏳️';
 }
 
 async function loadData(refresh = false) {
@@ -14,17 +71,58 @@ async function loadData(refresh = false) {
   const url = APPS_SCRIPT_URL + (refresh ? '?action=refresh' : '?action=state');
   const response = await fetch(url);
   const data = await response.json();
+  dashboardData = data;
 
   document.getElementById('updated').textContent =
     'Last updated: ' + new Date(data.updatedAt).toLocaleString();
 
+  renderHighlights(data);
   renderLeaderboard(data.leaderboard || []);
-  renderOwnerCards(data.leaderboard || []);
+  renderOwnerCards(data.leaderboard || [], data.teams || []);
+  renderGroupCards(data.teams || []);
+  renderMatchCenter(data.games || []);
   renderTeams(data.teams || []);
-  renderGames(data.games || []);
+}
+
+function renderHighlights(data) {
+  const teams = data.teams || [];
+  const bestTeam = [...teams].sort((a, b) => Number(b['Total Pts'] || 0) - Number(a['Total Pts'] || 0))[0];
+  const leader = (data.leaderboard || [])[0];
+
+  const html = `
+    <section class="highlight-grid">
+      <div class="highlight-card trophy">
+        <div class="label">Current Leader</div>
+        <div class="big">${leader ? leader.owner : '-'}</div>
+        <div>${leader ? leader.total + ' pts' : ''}</div>
+      </div>
+      <div class="highlight-card">
+        <div class="label">Most Valuable Team</div>
+        <div class="big">${bestTeam ? `${flag(bestTeam.Team)} ${bestTeam.Team}` : '-'}</div>
+        <div>${bestTeam ? bestTeam.Owner + ' • ' + bestTeam['Total Pts'] + ' pts' : ''}</div>
+      </div>
+      <div class="highlight-card">
+        <div class="label">Prize Pool</div>
+        <div class="big">$400</div>
+        <div>Winner takes all</div>
+      </div>
+    </section>
+  `;
+
+  const main = document.querySelector('main');
+  if (!document.getElementById('highlights')) {
+    const wrap = document.createElement('div');
+    wrap.id = 'highlights';
+    wrap.className = 'wide';
+    main.prepend(wrap);
+  }
+
+  document.getElementById('highlights').innerHTML = html;
 }
 
 function renderLeaderboard(rows) {
+  const medals = ['🥇', '🥈', '🥉'];
+
   document.getElementById('leaderboard').innerHTML = `
     <table>
       <thead>
@@ -37,9 +135,9 @@ function renderLeaderboard(rows) {
       <tbody>
         ${rows.map((r, i) => `
           <tr class="leader-row ${ownerClass(r.owner)}">
-            <td>${i + 1}</td>
-            <td>${r.owner}</td>
-            <td>${r.total}</td>
+            <td>${medals[i] || i + 1}</td>
+            <td><strong>${r.owner}</strong></td>
+            <td><strong>${r.total}</strong></td>
           </tr>
         `).join('')}
       </tbody>
@@ -47,18 +145,132 @@ function renderLeaderboard(rows) {
   `;
 }
 
-function renderOwnerCards(rows) {
+function renderOwnerCards(rows, teams) {
   document.getElementById('owners').innerHTML = `
     <div class="owner-grid">
-      ${rows.map(r => `
-        <div class="owner-card ${ownerClass(r.owner)}">
-          <h3>${r.owner}</h3>
-          <div class="points">${r.total} pts</div>
-          <ul>
-            ${(r.teams || []).map(t => `<li>${t}</li>`).join('')}
-          </ul>
-        </div>
-      `).join('')}
+      ${rows.map(r => {
+        const ownerTeams = teams
+          .filter(t => t.Owner === r.owner)
+          .sort((a, b) => Number(b['Total Pts'] || 0) - Number(a['Total Pts'] || 0));
+
+        return `
+          <div class="owner-card ${ownerClass(r.owner)}">
+            <h3>${r.owner}</h3>
+            <div class="points">${r.total} pts</div>
+            <ul>
+              ${ownerTeams.map(t => `
+                <li>
+                  <span>${flag(t.Team)} ${t.Team}</span>
+                  <strong>${t['Total Pts'] || 0}</strong>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function renderGroupCards(rows) {
+  const groups = groupBy(rows, 'Group');
+
+  const html = Object.keys(groups).sort().map(group => {
+    const teams = groups[group]
+      .map(t => ({ ...t, total: Number(t['Total Pts'] || 0), groupPts: Number(t['Group Pts'] || 0) }))
+      .sort((a, b) => b.groupPts - a.groupPts || b.total - a.total);
+
+    return `
+      <div class="group-card">
+        <h3>Group ${group}</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Team</th>
+              <th>Owner</th>
+              <th>Group</th>
+              <th>Total</th>
+              <th>Projection</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${teams.map((t, i) => `
+              <tr class="${ownerClass(t.Owner)}">
+                <td>${flag(t.Team)} ${t.Team}</td>
+                <td>${t.Owner}</td>
+                <td>${t.groupPts}</td>
+                <td><strong>${t.total}</strong></td>
+                <td>${i < 2 ? '<span class="advance">Projected Advancing</span>' : ''}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }).join('');
+
+  if (!document.getElementById('groups')) {
+    const section = document.createElement('section');
+    section.id = 'groups-section';
+    section.className = 'card wide';
+    section.innerHTML = '<h2>Group Standings & Projected Advancement</h2><div id="groups"></div>';
+
+    const teamsSection = document.getElementById('teams').closest('section');
+    teamsSection.parentNode.insertBefore(section, teamsSection);
+  }
+
+  document.getElementById('groups').innerHTML = `<div class="group-grid">${html}</div>`;
+}
+
+function renderMatchCenter(rows) {
+  const now = new Date();
+
+  const cleaned = rows
+    .filter(r => r['Team 1'] && r['Team 2'])
+    .map(r => ({ ...r, dateObj: new Date(r.Date), statusText: String(r.Status || '').toLowerCase() }));
+
+  const completed = cleaned
+    .filter(r => isCompleted(r))
+    .sort((a, b) => b.dateObj - a.dateObj)
+    .slice(0, 10);
+
+  const live = cleaned
+    .filter(r => !isCompleted(r) && r.dateObj <= now && hasScore(r))
+    .sort((a, b) => a.dateObj - b.dateObj);
+
+  const upcoming = cleaned
+    .filter(r => !isCompleted(r) && r.dateObj > now)
+    .sort((a, b) => a.dateObj - b.dateObj)
+    .slice(0, 10);
+
+  document.getElementById('games').innerHTML = `
+    <div class="match-center">
+      ${matchSection('🔴 Live / In Progress', live)}
+      ${matchSection('✅ Recent Completed', completed)}
+      ${matchSection('📅 Upcoming', upcoming)}
+    </div>
+  `;
+}
+
+function matchSection(title, matches) {
+  return `
+    <div class="match-section">
+      <h3>${title}</h3>
+      ${matches.length ? matches.map(matchCard).join('') : '<p class="muted">No matches in this section.</p>'}
+    </div>
+  `;
+}
+
+function matchCard(r) {
+  return `
+    <div class="match-card">
+      <div class="match-date">${formatDate(r.Date)}</div>
+      <div class="match-teams">
+        <span>${teamWithFlag(r['Team 1'])}</span>
+        <strong>${safe(r['Score 1'])} - ${safe(r['Score 2'])}</strong>
+        <span>${teamWithFlag(r['Team 2'])}</span>
+      </div>
+      <div class="match-status">${r.Status || ''}</div>
     </div>
   `;
 }
@@ -79,7 +291,7 @@ function renderTeams(rows) {
       <tbody>
         ${rows.map(r => `
           <tr class="${ownerClass(r.Owner)}">
-            <td>${r.Team}</td>
+            <td>${flag(r.Team)} ${r.Team}</td>
             <td>${r.Owner}</td>
             <td>${r.Group}</td>
             <td>${r['Group Pts'] || 0}</td>
@@ -92,33 +304,26 @@ function renderTeams(rows) {
   `;
 }
 
-function renderGames(rows) {
-  document.getElementById('games').innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Stage</th>
-          <th>Group</th>
-          <th>Match</th>
-          <th>Score</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows.map(r => `
-          <tr>
-            <td>${formatDate(r.Date)}</td>
-            <td>${r.Stage || ''}</td>
-            <td>${r.Group || ''}</td>
-            <td>${r['Team 1']} vs ${r['Team 2']}</td>
-            <td>${safe(r['Score 1'])} - ${safe(r['Score 2'])}</td>
-            <td>${r.Status || ''}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
+function isCompleted(r) {
+  const s = String(r.Status || '').toLowerCase();
+  return s.includes('full time') || s.includes('final') || s.includes('complete') || s.includes('finished');
+}
+
+function hasScore(r) {
+  return safe(r['Score 1']) !== '' && safe(r['Score 2']) !== '';
+}
+
+function teamWithFlag(team) {
+  return `${flag(team)} ${team}`;
+}
+
+function groupBy(rows, key) {
+  return rows.reduce((acc, row) => {
+    const value = row[key] || 'Other';
+    acc[value] = acc[value] || [];
+    acc[value].push(row);
+    return acc;
+  }, {});
 }
 
 function formatDate(value) {
