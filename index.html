@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FIFA 2026 Draft Tracker</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">FIFA 2026 World Cup Pool</p>
+      <h1>Draft Tracker</h1>
+      <p>$100 buy-in • $400 winner takes all • Live scoring dashboard</p>
+    </div>
+    <button id="refreshBtn">Refresh</button>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Leaderboard</h2>
+      <p id="updated" class="muted"></p>
+      <div id="leaderboard"></div>
+    </section>
+
+    <section class="card">
+      <h2>Scoring</h2>
+      <div class="rules">
+        <div><strong>Group Win</strong><span>3</span></div>
+        <div><strong>Group Draw</strong><span>1</span></div>
+        <div><strong>Group Loss</strong><span>0</span></div>
+        <div><strong>Pool Advancement</strong><span>0</span></div>
+        <div><strong>Round of 16</strong><span>5</span></div>
+        <div><strong>Quarterfinals</strong><span>10</span></div>
+        <div><strong>Semifinals</strong><span>15</span></div>
+        <div><strong>3rd Place</strong><span>10</span></div>
+        <div><strong>Runner-Up</strong><span>20</span></div>
+        <div><strong>Winner</strong><span>30</span></div>
+      </div>
+    </section>
+
+    <section class="card wide">
+      <h2>Owner Teams</h2>
+      <div id="owners"></div>
+    </section>
+
+    <section class="card wide">
+      <h2>All Teams</h2>
+      <div id="teams"></div>
+    </section>
+
+    <section class="card wide">
+      <h2>Schedule / Results</h2>
+      <div id="games"></div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
