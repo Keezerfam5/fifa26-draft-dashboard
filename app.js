@@ -125,6 +125,21 @@ function renderHighlights(data) {
   document.getElementById('highlights').innerHTML = html;
 }
 
+function toDateKey(value) {
+  const d = new Date(value);
+  if (isNaN(d)) return '';
+  return d.toISOString().slice(0, 10);
+}
+
+function formatTickerDateLabel(dateKey) {
+  const d = new Date(dateKey + 'T12:00:00');
+  return d.toLocaleDateString([], {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric'
+  });
+}
+
 function renderTicker(games) {
   const dates = [...new Set(
     games
