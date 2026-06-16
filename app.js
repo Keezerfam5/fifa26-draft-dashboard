@@ -81,6 +81,7 @@ async function loadData(refresh = false) {
     'Last updated: ' + new Date(data.updatedAt).toLocaleString();
 
   renderHighlights(data);
+  renderTicker(data.games || []);
   renderLeaderboard(data.leaderboard || []);
   renderOwnerCards(data.leaderboard || [], data.teams || []);
   renderGroupCards(data.teams || []);
@@ -122,6 +123,63 @@ function renderHighlights(data) {
   }
 
   document.getElementById('highlights').innerHTML = html;
+}
+
+function renderTicker(games) {
+  const now = new Date();
+
+  const tickerGames = games
+    .filter(g => g['Team 1'] && g['Team 2'])
+    .map(g => ({ ...g, dateObj: new Date(g.Date) }))
+    .sort((a, b) => a.dateObj - b.dateObj)
+    .filter(g => isCompleted(g) || g.dateObj >= now)
+    .slice(0, 12);
+
+  const html = `
+    <div class="ticker-strip">
+      ${tickerGames.map(g => `
+        <div class="ticker-game">
+          <div class="ticker-top">
+            <span>${isCompleted(g) ? 'FT' : formatShortTime(g.Date)}</span>
+            <span class="ticker-tv">${g.Status || ''}</span>
+          </div>
+
+          <div class="ticker-team">
+            <span>${flag(g['Team 1'])} ${g['Team 1']}</span>
+            <strong>${safe(g['Score 1'])}</strong>
+          </div>
+
+          <div class="ticker-team">
+            <span>${flag(g['Team 2'])} ${g['Team 2']}</span>
+            <strong>${safe(g['Score 2'])}</strong>
+          </div>
+
+          <div class="ticker-odds">
+            Odds Coming Soon
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  if (!document.getElementById('ticker')) {
+    const ticker = document.createElement('div');
+    ticker.id = 'ticker';
+    document.querySelector('.hero').insertAdjacentElement('afterend', ticker);
+  }
+
+  document.getElementById('ticker').innerHTML = html;
+}
+
+function formatShortTime(value) {
+  if (!value) return '';
+
+  const date = new Date(value);
+
+  return date.toLocaleTimeString([], {
+    hour: 'numeric',
+    minute: '2-digit'
+  });
 }
 
 function renderLeaderboard(rows) {
