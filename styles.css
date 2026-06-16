@@ -253,12 +253,21 @@ th {
   vertical-align: -3px;
   box-shadow: 0 0 0 1px rgba(0,0,0,.08);
 }
+
+
 @media (max-width: 1100px) {
   .owner-grid,
   .group-grid,
   .highlight-grid {
     grid-template-columns: 1fr 1fr;
   }
+}
+.group-divider td {
+  border-top: 4px solid #111827 !important;
+}
+
+.group-divider:first-child td {
+  border-top: none !important;
 }
 
 @media (max-width: 900px) {
