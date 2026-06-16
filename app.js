@@ -126,18 +126,36 @@ function renderHighlights(data) {
 }
 
 function renderTicker(games) {
-  const now = new Date();
+  const dates = [...new Set(
+    games
+      .filter(g => g.Date)
+      .map(g => toDateKey(g.Date))
+  )].sort();
+
+  const todayKey = toDateKey(new Date());
+  const selectedKey = window.selectedTickerDate || (dates.includes(todayKey) ? todayKey : dates[0]);
+
+  window.selectedTickerDate = selectedKey;
 
   const tickerGames = games
     .filter(g => g['Team 1'] && g['Team 2'])
-    .map(g => ({ ...g, dateObj: new Date(g.Date) }))
-    .sort((a, b) => a.dateObj - b.dateObj)
-    .filter(g => isCompleted(g) || g.dateObj >= now)
-    .slice(0, 12);
+    .filter(g => toDateKey(g.Date) === selectedKey)
+    .sort((a, b) => new Date(a.Date) - new Date(b.Date));
 
   const html = `
+    <div class="ticker-header">
+      <strong>Matches</strong>
+      <select id="tickerDateSelect">
+        ${dates.map(d => `
+          <option value="${d}" ${d === selectedKey ? 'selected' : ''}>
+            ${formatTickerDateLabel(d)}
+          </option>
+        `).join('')}
+      </select>
+    </div>
+
     <div class="ticker-strip">
-      ${tickerGames.map(g => `
+      ${tickerGames.length ? tickerGames.map(g => `
         <div class="ticker-game">
           <div class="ticker-top">
             <span>${isCompleted(g) ? 'FT' : formatShortTime(g.Date)}</span>
@@ -154,11 +172,9 @@ function renderTicker(games) {
             <strong>${safe(g['Score 2'])}</strong>
           </div>
 
-          <div class="ticker-odds">
-            Odds Coming Soon
-          </div>
+          <div class="ticker-odds">Odds Coming Soon</div>
         </div>
-      `).join('')}
+      `).join('') : `<div class="ticker-empty">No matches for this date.</div>`}
     </div>
   `;
 
@@ -169,6 +185,11 @@ function renderTicker(games) {
   }
 
   document.getElementById('ticker').innerHTML = html;
+
+  document.getElementById('tickerDateSelect').addEventListener('change', e => {
+    window.selectedTickerDate = e.target.value;
+    renderTicker(games);
+  });
 }
 
 function formatShortTime(value) {
