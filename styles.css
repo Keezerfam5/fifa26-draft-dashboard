@@ -255,6 +255,47 @@ th {
   box-shadow: 0 0 0 1px rgba(0,0,0,.08);
 }
 
+#ticker {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.ticker-strip {
+  display: flex;
+  min-height: 100px;
+}
+
+.ticker-game {
+  min-width: 220px;
+  padding: 10px;
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.ticker-game:hover {
+  background: #f8fafc;
+}
+
+.ticker-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.ticker-team {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.ticker-odds {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #6b7280;
+}
 
 @media (max-width: 1100px) {
   .owner-grid,
