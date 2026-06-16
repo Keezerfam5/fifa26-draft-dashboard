@@ -28,6 +28,23 @@ body {
   max-width: 100vw;
 }
 
+.ticker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  background: #f9fafb;
+}
+
+.ticker-header select {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-weight: 700;
+  background: white;
+}
+
 .hero {
   background: linear-gradient(135deg, #111827, #1e3a8a);
   color: white;
