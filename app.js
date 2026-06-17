@@ -84,9 +84,10 @@ async function loadData(refresh = false) {
   renderTicker(data.games || []);
   renderLeaderboard(data.leaderboard || []);
   renderOwnerCards(data.leaderboard || [], data.teams || []);
-  renderGroupCards(data.teams || []);
-  renderMatchCenter(data.games || []);
-  renderTeams(data.teams || []);
+renderGroupCards(data.teams || []);
+renderKnockoutBracket(data.games || []);
+renderMatchCenter(data.games || []);
+renderTeams(data.teams || []);
 }
 
 function renderHighlights(data) {
@@ -359,6 +360,82 @@ function renderGroupCards(rows) {
   }
 
   document.getElementById('groups').innerHTML = `<div class="group-grid">${html}</div>`;
+}
+
+function renderKnockoutBracket(games) {
+  const knockoutGames = games
+    .filter(g => String(g.Stage || '').toLowerCase() !== 'group')
+    .filter(g => g['Team 1'] && g['Team 2'])
+    .sort((a, b) => new Date(a.Date) - new Date(b.Date));
+
+  const rounds = {
+    'Round of 32': [],
+    'Round of 16': [],
+    'Quarterfinal': [],
+    'Semifinal': [],
+    'Third Place': [],
+    'Final': []
+  };
+
+  knockoutGames.forEach(g => {
+    const stage = String(g.Stage || '').trim();
+    if (rounds[stage]) {
+      rounds[stage].push(g);
+    }
+  });
+
+  const html = `
+    <div class="bracket-scroll">
+      <div class="bracket-grid">
+        ${Object.keys(rounds).map(round => `
+          <div class="bracket-round">
+            <h3>${round}</h3>
+            ${rounds[round].length ? rounds[round].map(g => `
+              <div class="bracket-game">
+                <div class="bracket-date">${formatDate(g.Date)}</div>
+
+                <div class="bracket-team">
+                  <span>${teamLabel(g['Team 1'])}</span>
+                  <strong>${safe(g['Score 1'])}</strong>
+                </div>
+
+                <div class="bracket-team">
+                  <span>${teamLabel(g['Team 2'])}</span>
+                  <strong>${safe(g['Score 2'])}</strong>
+                </div>
+
+                <div class="bracket-status">${g.Status || ''}</div>
+              </div>
+            `).join('') : '<p class="muted">No games yet</p>'}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  if (!document.getElementById('bracket-section')) {
+    const section = document.createElement('section');
+    section.id = 'bracket-section';
+    section.className = 'card wide';
+    section.innerHTML = '<h2>Knockout Bracket</h2><div id="bracket"></div>';
+
+    const gamesSection = document.getElementById('games').closest('section');
+    gamesSection.parentNode.insertBefore(section, gamesSection);
+  }
+
+  document.getElementById('bracket').innerHTML = html;
+}
+
+function teamLabel(team) {
+  if (!team) return '';
+
+  const lower = String(team).toLowerCase();
+
+  if (lower.includes('winner') || lower.includes('loser')) {
+    return `<span class="placeholder-team">${team}</span>`;
+  }
+
+  return `${flag(team)} ${team}`;
 }
 
 function calculateAdvancementProjection(team, groupTeams, games, records) {
