@@ -419,8 +419,8 @@ function renderKnockoutBracket(games) {
     section.className = 'card wide';
     section.innerHTML = '<h2>Knockout Bracket</h2><div id="bracket"></div>';
 
-    const gamesSection = document.getElementById('games').closest('section');
-    gamesSection.parentNode.insertBefore(section, gamesSection);
+const ownersSection = document.getElementById('owners').closest('section');
+ownersSection.insertAdjacentElement('afterend', section);
   }
 
   document.getElementById('bracket').innerHTML = html;
