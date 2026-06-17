@@ -383,7 +383,7 @@ function calculateAdvancementProjection(team, groupTeams, games, records) {
 
   let percentage = 50 + ((projectedPts - secondPlaceTarget) * 18);
 
-  if (currentPts >= secondPlaceTarget) percentage += 10;
+  if (currentPts > secondPlaceTarget) percentage += 10;
   if (remaining === 0 && projectedPts >= secondPlaceTarget) percentage = 95;
   if (remaining === 0 && projectedPts < secondPlaceTarget) percentage = 5;
 
