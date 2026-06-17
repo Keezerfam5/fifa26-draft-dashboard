@@ -459,11 +459,11 @@ function bracketGame(g, context = {}) {
     <div class="bracket-game">
       <div class="bracket-date">${formatDate(g.Date)}</div>
       <div class="bracket-team">
-        <span>${teamLabel(g['Team 1'], context)}</span>
+<span>${teamLabelWithOwner(g['Team 1'], context)}</span>
         <strong>${safe(g['Score 1'])}</strong>
       </div>
       <div class="bracket-team">
-        <span>${teamLabel(g['Team 2'], context)}</span>
+        <span>${teamLabelWithOwner(g['Team 2'], context)}</span>
         <strong>${safe(g['Score 2'])}</strong>
       </div>
       <div class="bracket-status">${g.Status || ''}</div>
@@ -498,6 +498,35 @@ function teamLabel(team, context = {}) {
   }
 
   return `${flag(resolved)} ${resolved}`;
+}
+
+function teamLabelWithOwner(team, context = {}) {
+  const resolved = resolveBracketTeam(team, context);
+
+  if (!resolved) return '';
+
+  const teamRow = (dashboardData?.teams || []).find(
+    t => normalizeTeamName(t.Team) === normalizeTeamName(resolved)
+  );
+
+  const owner = teamRow?.Owner || '';
+
+  const lower = String(resolved).toLowerCase();
+
+  if (
+    lower.includes('winner') ||
+    lower.includes('loser') ||
+    lower.includes('runner')
+  ) {
+    return `<span class="placeholder-team">${resolved}</span>`;
+  }
+
+  return `
+    <div class="bracket-team-info">
+      <div>${flag(resolved)} ${resolved}</div>
+      <div class="bracket-owner">${owner}</div>
+    </div>
+  `;
 }
 
 function resolveBracketTeam(name, context) {
