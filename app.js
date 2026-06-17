@@ -427,17 +427,6 @@ ${third.length ? third.map(g => bracketGame(g, context)).join('') : '<div class=
   document.getElementById('bracket').innerHTML = html;
 }
 
-function bracketColumn(title, games) {
-  return `
-    <div class="bracket-column">
-      <h3>${title}</h3>
-      <div class="bracket-column-games">
-        ${games.length ? games.map(g => bracketGame(g)).join('') : '<div class="bracket-placeholder">TBD</div>'}
-      </div>
-    </div>
-  `;
-}
-
 function bracketGame(g, context = {}) {
   return `
     <div class="bracket-game">
@@ -482,18 +471,6 @@ function teamLabel(team, context = {}) {
   }
 
   return `${flag(resolved)} ${resolved}`;
-}
-
-function teamLabel(team) {
-  if (!team) return '';
-
-  const lower = String(team).toLowerCase();
-
-  if (lower.includes('winner') || lower.includes('loser')) {
-    return `<span class="placeholder-team">${team}</span>`;
-  }
-
-  return `${flag(team)} ${team}`;
 }
 
 function resolveBracketTeam(name, context) {
