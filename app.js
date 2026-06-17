@@ -174,7 +174,10 @@ function renderTicker(games) {
 
     <div class="ticker-strip">
       ${tickerGames.length ? tickerGames.map(g => `
-        <div class="ticker-game">
+<div
+  class="ticker-game"
+  onclick="openMatchModal(dashboardData.games[${games.indexOf(g)}])"
+>
           <div class="ticker-top">
             <span>${isCompleted(g) ? 'FT' : formatShortTime(g.Date)}</span>
             <span class="ticker-tv">${g.Status || ''}</span>
@@ -220,6 +223,46 @@ function formatOdds(g) {
   if (!odds) return '';
 
   return `${odds}${overUnder ? ' | O/U ' + overUnder : ''}`;
+}
+
+function openMatchModal(game) {
+  const body = document.getElementById('matchModalBody');
+
+  body.innerHTML = `
+    <h2>${flag(game['Team 1'])} ${game['Team 1']} vs ${flag(game['Team 2'])} ${game['Team 2']}</h2>
+
+    <div class="modal-team">
+      <span>${game['Score 1'] ?? '-'}</span>
+      <span>${game['Score 2'] ?? '-'}</span>
+    </div>
+
+    <div class="modal-row">
+      <span class="modal-label">Status:</span>
+      ${game.Status || '-'}
+    </div>
+
+    <div class="modal-row">
+      <span class="modal-label">Stage:</span>
+      ${game.Stage || '-'}
+    </div>
+
+    <div class="modal-row">
+      <span class="modal-label">Date:</span>
+      ${formatDate(game.Date)}
+    </div>
+
+    <div class="modal-row">
+      <span class="modal-label">Odds:</span>
+      ${game.Odds || 'Unavailable'}
+    </div>
+
+    <div class="modal-row">
+      <span class="modal-label">Over/Under:</span>
+      ${game['O/U'] || 'Unavailable'}
+    </div>
+  `;
+
+  document.getElementById('matchModal').style.display = 'block';
 }
 
 function formatShortTime(value) {
@@ -660,7 +703,10 @@ function matchSection(title, matches) {
 
 function matchCard(r) {
   return `
-    <div class="match-card">
+<div
+  class="match-card"
+  onclick="openMatchModal(${JSON.stringify(r).replace(/"/g,'&quot;')})"
+>
       <div class="match-date">${formatDate(r.Date)}</div>
       <div class="match-teams">
         <span>${teamWithFlag(r['Team 1'])}</span>
@@ -823,6 +869,16 @@ function normalizeTeamName(value) {
 }
 
 document.getElementById('refreshBtn').addEventListener('click', () => loadData(true));
+
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('modal-close')) {
+    document.getElementById('matchModal').style.display = 'none';
+  }
+
+  if (e.target.id === 'matchModal') {
+    document.getElementById('matchModal').style.display = 'none';
+  }
+});
 
 loadData(false);
 
