@@ -374,16 +374,22 @@ function renderKnockoutBracket(games) {
   const sf = knockoutGames.filter(g => g.Stage === 'Semifinal');
   const third = knockoutGames.filter(g => g.Stage === 'Third Place');
   const final = knockoutGames.filter(g => g.Stage === 'Final');
-
+const context = {
+  r32Winners: r32.map(getWinner),
+  r16Winners: r16.map(getWinner),
+  qfWinners: qf.map(getWinner),
+  sfWinners: sf.map(getWinner),
+  sfLosers: sf.map(getLoser)
+};
   const html = `
     <div class="worldcup-bracket-scroll">
       <div class="worldcup-bracket">
 
         <div class="bracket-wing left-wing">
-          ${bracketColumn('Round of 32', r32.slice(0, 8))}
-          ${bracketColumn('Round of 16', r16.slice(0, 4))}
-          ${bracketColumn('Quarterfinals', qf.slice(0, 2))}
-          ${bracketColumn('Semifinal', sf.slice(0, 1))}
+${bracketColumn('Round of 32', r32.slice(0, 8), context)}
+          ${bracketColumn('Round of 16', r16.slice(0, 4)context)}
+          ${bracketColumn('Quarterfinals', qf.slice(0, 2)context)}
+          ${bracketColumn('Semifinal', sf.slice(0, 1)context)}
         </div>
 
         <div class="bracket-championship">
@@ -391,10 +397,10 @@ function renderKnockoutBracket(games) {
 <img src="https://banner2.cleanpng.com/lnd/20241221/ih/b6374593827ace8ba25d0770708f34.webp" alt="World Cup Trophy">
 </div>
           <h3>Final</h3>
-          ${final.length ? final.map(g => bracketGame(g)).join('') : '<div class="champ-card">Final TBD</div>'}
+${final.length ? final.map(g => bracketGame(g, context)).join('') : '<div class="champ-card">Final TBD</div>'}
 
           <h3>3rd Place</h3>
-          ${third.length ? third.map(g => bracketGame(g)).join('') : '<div class="champ-card">3rd Place TBD</div>'}
+${third.length ? third.map(g => bracketGame(g, context)).join('') : '<div class="champ-card">3rd Place TBD</div>'}
         </div>
 
         <div class="bracket-wing right-wing">
@@ -432,21 +438,50 @@ function bracketColumn(title, games) {
   `;
 }
 
-function bracketGame(g) {
+function bracketGame(g, context = {}) {
   return `
     <div class="bracket-game">
       <div class="bracket-date">${formatDate(g.Date)}</div>
       <div class="bracket-team">
-        <span>${teamLabel(g['Team 1'])}</span>
+        <span>${teamLabel(g['Team 1'], context)}</span>
         <strong>${safe(g['Score 1'])}</strong>
       </div>
       <div class="bracket-team">
-        <span>${teamLabel(g['Team 2'])}</span>
+        <span>${teamLabel(g['Team 2'], context)}</span>
         <strong>${safe(g['Score 2'])}</strong>
       </div>
       <div class="bracket-status">${g.Status || ''}</div>
     </div>
   `;
+}
+
+function bracketColumn(title, games, context = {}) {
+  return `
+    <div class="bracket-column">
+      <h3>${title}</h3>
+      <div class="bracket-column-games">
+        ${games.length ? games.map(g => bracketGame(g, context)).join('') : '<div class="bracket-placeholder">TBD</div>'}
+      </div>
+    </div>
+  `;
+}
+
+function teamLabel(team, context = {}) {
+  if (!team) return '';
+
+  const resolved = resolveBracketTeam(team, context);
+  const lower = String(resolved).toLowerCase();
+
+  if (
+    lower.includes('winner') ||
+    lower.includes('loser') ||
+    lower.includes('runner') ||
+    lower.includes('group')
+  ) {
+    return `<span class="placeholder-team">${resolved}</span>`;
+  }
+
+  return `${flag(resolved)} ${resolved}`;
 }
 
 function teamLabel(team) {
@@ -459,6 +494,64 @@ function teamLabel(team) {
   }
 
   return `${flag(team)} ${team}`;
+}
+
+function resolveBracketTeam(name, context) {
+  const raw = String(name || '').trim();
+  const lower = raw.toLowerCase();
+
+  const knockoutMatch = lower.match(/round of 32 (\d+) winner/);
+  if (knockoutMatch) {
+    return context.r32Winners?.[Number(knockoutMatch[1]) - 1] || raw;
+  }
+
+  const r16Match = lower.match(/round of 16 (\d+) winner/);
+  if (r16Match) {
+    return context.r16Winners?.[Number(r16Match[1]) - 1] || raw;
+  }
+
+  const qfMatch = lower.match(/quarterfinal (\d+) winner/);
+  if (qfMatch) {
+    return context.qfWinners?.[Number(qfMatch[1]) - 1] || raw;
+  }
+
+  const sfWinnerMatch = lower.match(/semifinal (\d+) winner/);
+  if (sfWinnerMatch) {
+    return context.sfWinners?.[Number(sfWinnerMatch[1]) - 1] || raw;
+  }
+
+  const sfLoserMatch = lower.match(/semifinal (\d+) loser/);
+  if (sfLoserMatch) {
+    return context.sfLosers?.[Number(sfLoserMatch[1]) - 1] || raw;
+  }
+
+  return raw;
+}
+
+function getWinner(g) {
+  if (!isCompleted(g)) return '';
+
+  const s1 = Number(g['Score 1']);
+  const s2 = Number(g['Score 2']);
+
+  if (isNaN(s1) || isNaN(s2)) return '';
+  if (s1 > s2) return g['Team 1'];
+  if (s2 > s1) return g['Team 2'];
+
+  return '';
+}
+
+function getLoser(g) {
+  if (!isCompleted(g)) return '';
+
+  const s1 = Number(g['Score 1']);
+  const s2 = Number(g['Score 2']);
+
+  if (isNaN(s1) || isNaN(s2)) return '';
+  if (s1 > s2) return g['Team 2'];
+  if (s2 > s1) return g['Team 1'];
+
+  return '';
 }
 
 function calculateAdvancementProjection(team, groupTeams, games, records) {
