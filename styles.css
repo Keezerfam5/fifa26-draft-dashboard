@@ -151,8 +151,10 @@ h2, h3 {
 }
 
 .highlight-card .big {
-  display: block;
+  font-size: 28px;
+  font-weight: 900;
   line-height: 1.1;
+  word-break: break-word;
 }
 
 .highlight-card .big + div {
