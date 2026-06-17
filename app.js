@@ -97,11 +97,11 @@ function renderHighlights(data) {
 
   const html = `
     <section class="highlight-grid">
-      <div class="highlight-card trophy">
-        <div class="label">Current Leader</div>
-        <div class="big">${leader ? leader.owner : '-'}</div>
-        <div>${leader ? leader.total + ' pts' : ''}</div>
-      </div>
+<div class="highlight-card leader-highlight">
+  <div class="label">Current Leader</div>
+  <div class="big">${leader ? leader.owner : '-'}</div>
+  <div class="subtext">${leader ? leader.total + ' pts' : ''}</div>
+</div>
       <div class="highlight-card">
         <div class="label">Most Valuable Team</div>
         <div class="big">${bestTeam ? flag(bestTeam.Team) + ' ' + bestTeam.Team : '-'}</div>
