@@ -215,6 +215,20 @@ th {
   font-weight: 800;
 }
 
+.projected-row {
+  outline: 2px solid rgba(22, 101, 52, .25);
+}
+
+.not-advancing {
+  display: inline-block;
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .match-center {
   display: grid;
   grid-template-columns: 1fr;
