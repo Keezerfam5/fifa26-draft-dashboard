@@ -235,9 +235,34 @@ function formatShortTime(value) {
   }) + ' ET';
 }
 
+function calculateTitleProbabilities(rows) {
+  const totals = rows.map(r => ({
+    owner: r.owner,
+    current: Number(r.total || 0),
+    max: Number(r.maxPossible || 0)
+  }));
+
+  const minMax = Math.min(...totals.map(r => r.max));
+  const weights = totals.map(r => {
+    const currentBonus = r.current * 0.35;
+    const ceilingBonus = Math.max(0, r.max - minMax + 1);
+    return {
+      owner: r.owner,
+      weight: Math.max(1, currentBonus + ceilingBonus)
+    };
+  });
+
+  const totalWeight = weights.reduce((sum, r) => sum + r.weight, 0);
+
+  return weights.reduce((acc, r) => {
+    acc[r.owner] = totalWeight ? Math.round((r.weight / totalWeight) * 100) : 0;
+    return acc;
+  }, {});
+}
 
 function renderLeaderboard(rows) {
   const medals = ['🥇', '🥈', '🥉'];
+  const titleOdds = calculateTitleProbabilities(rows);
 
   document.getElementById('leaderboard').innerHTML = `
     <table>
@@ -248,6 +273,7 @@ function renderLeaderboard(rows) {
           <th>Current</th>
           <th>Remaining</th>
           <th>Max</th>
+          <th>Title %</th>
         </tr>
       </thead>
       <tbody>
@@ -258,6 +284,7 @@ function renderLeaderboard(rows) {
             <td><strong>${r.total || 0}</strong></td>
             <td>${r.remainingPossible || 0}</td>
             <td><strong>${r.maxPossible || 0}</strong></td>
+            <td><strong>${titleOdds[r.owner] || 0}%</strong></td>
           </tr>
         `).join('')}
       </tbody>
