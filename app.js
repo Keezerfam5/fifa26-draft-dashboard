@@ -212,10 +212,12 @@ function formatShortTime(value) {
 
   const date = new Date(value);
 
-  return date.toLocaleTimeString([], {
+  return date.toLocaleTimeString('en-US', {
+    timeZone: 'America/New_York',
     hour: 'numeric',
-    minute: '2-digit'
-  });
+    minute: '2-digit',
+    hour12: true
+  }) + ' ET';
 }
 
 function renderLeaderboard(rows) {
