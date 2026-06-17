@@ -189,8 +189,9 @@ function renderTicker(games) {
             <strong>${safe(g['Score 2'])}</strong>
           </div>
 
-          <div class="ticker-odds">Odds Coming Soon</div>
-        </div>
+        <div class="ticker-odds">
+  ${formatOdds(g)}
+</div>
       `).join('') : `<div class="ticker-empty">No matches for this date.</div>`}
     </div>
   `;
