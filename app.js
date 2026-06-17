@@ -364,7 +364,7 @@ function renderGroupCards(rows) {
 function calculateAdvancementProjection(team, groupTeams, games, records) {
   const teamName = team.Team;
   const currentPts = Number(team['Group Pts'] || 0);
-  const rec = records[teamName] || { w: 0, l: 0, d: 0 };
+const rec = records[normalizeTeamName(teamName)] || { w: 0, l: 0, d: 0 };
 
   const played = rec.w + rec.l + rec.d;
   const remaining = Math.max(0, 3 - played);
