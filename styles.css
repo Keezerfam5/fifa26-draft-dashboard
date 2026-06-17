@@ -347,6 +347,65 @@ th {
   color: #6b7280;
 }
 
+.bracket-scroll {
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.bracket-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(220px, 1fr));
+  gap: 14px;
+  min-width: 1320px;
+}
+
+.bracket-round {
+  background: #f9fafb;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.bracket-round h3 {
+  font-size: 15px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.bracket-game {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.bracket-date {
+  color: var(--muted);
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+
+.bracket-team {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 13px;
+  margin: 5px 0;
+}
+
+.bracket-status {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 6px;
+}
+
+.placeholder-team {
+  color: var(--muted);
+  font-style: italic;
+}
+
 @media (max-width: 1100px) {
   .owner-grid,
   .group-grid,
