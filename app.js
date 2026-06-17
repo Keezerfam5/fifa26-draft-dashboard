@@ -189,12 +189,27 @@ function renderTicker(games) {
             <strong>${safe(g['Score 2'])}</strong>
           </div>
 
-        <div class="ticker-odds">
-  TEST
-</div>
+          <div class="ticker-odds">
+            ${formatOdds(g)}
+          </div>
+        </div>
       `).join('') : `<div class="ticker-empty">No matches for this date.</div>`}
     </div>
   `;
+
+  if (!document.getElementById('ticker')) {
+    const ticker = document.createElement('div');
+    ticker.id = 'ticker';
+    document.querySelector('.hero').insertAdjacentElement('afterend', ticker);
+  }
+
+  document.getElementById('ticker').innerHTML = html;
+
+  document.getElementById('tickerDateSelect').addEventListener('change', e => {
+    window.selectedTickerDate = e.target.value;
+    renderTicker(games);
+  });
+}
 
   if (!document.getElementById('ticker')) {
     const ticker = document.createElement('div');
