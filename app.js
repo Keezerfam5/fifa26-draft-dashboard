@@ -560,6 +560,8 @@ function normalizeTeamName(value) {
   let v = String(value || '')
     .trim()
     .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .replace(/[()]/g, '')
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
@@ -571,7 +573,6 @@ function normalizeTeamName(value) {
     'united states of america': 'united states',
 
     'turkey': 'turkiye',
-    'türkiye': 'turkiye',
     'turkiye': 'turkiye',
 
     'bosnia': 'bosnia',
@@ -579,14 +580,14 @@ function normalizeTeamName(value) {
     'bosnia and herzegovina': 'bosnia',
 
     'curacao': 'curacao',
-    'curaçao': 'curacao',
 
     'cote d ivoire': 'ivory coast',
     'ivory coast': 'ivory coast',
 
     'dr congo': 'congo',
     'congo dr': 'congo',
-    'democratic republic of congo': 'congo'
+    'democratic republic of congo': 'congo',
+    'democratic republic of the congo': 'congo'
   };
 
   return aliases[v] || v;
