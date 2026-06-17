@@ -226,43 +226,47 @@ function formatOdds(g) {
 }
 
 function openMatchModal(game) {
+  const modal = document.getElementById('matchModal');
   const body = document.getElementById('matchModalBody');
 
   body.innerHTML = `
-    <h2>${flag(game['Team 1'])} ${game['Team 1']} vs ${flag(game['Team 2'])} ${game['Team 2']}</h2>
+    <h2>${game.Stage || ''} Match Detail</h2>
 
-    <div class="modal-team">
-      <span>${game['Score 1'] ?? '-'}</span>
-      <span>${game['Score 2'] ?? '-'}</span>
+    <div class="modal-scoreline">
+      <div>${flag(game['Team 1'])} ${game['Team 1']}</div>
+      <div class="modal-score">${safe(game['Score 1']) || '-'} - ${safe(game['Score 2']) || '-'}</div>
+      <div class="away">${flag(game['Team 2'])} ${game['Team 2']}</div>
     </div>
 
-    <div class="modal-row">
-      <span class="modal-label">Status:</span>
-      ${game.Status || '-'}
-    </div>
-
-    <div class="modal-row">
-      <span class="modal-label">Stage:</span>
-      ${game.Stage || '-'}
-    </div>
-
-    <div class="modal-row">
-      <span class="modal-label">Date:</span>
-      ${formatDate(game.Date)}
-    </div>
-
-    <div class="modal-row">
-      <span class="modal-label">Odds:</span>
-      ${game.Odds || 'Unavailable'}
-    </div>
-
-    <div class="modal-row">
-      <span class="modal-label">Over/Under:</span>
-      ${game['O/U'] || 'Unavailable'}
+    <div class="modal-detail-grid">
+      <div class="modal-detail">
+        <div class="label">Status</div>
+        <div>${game.Status || '-'}</div>
+      </div>
+      <div class="modal-detail">
+        <div class="label">Date / Time</div>
+        <div>${formatDate(game.Date)}</div>
+      </div>
+      <div class="modal-detail">
+        <div class="label">Stage</div>
+        <div>${game.Stage || '-'}</div>
+      </div>
+      <div class="modal-detail">
+        <div class="label">Group</div>
+        <div>${game.Group || '-'}</div>
+      </div>
+      <div class="modal-detail">
+        <div class="label">Odds</div>
+        <div>${game.Odds || 'Unavailable'}</div>
+      </div>
+      <div class="modal-detail">
+        <div class="label">Over / Under</div>
+        <div>${game['O/U'] || 'Unavailable'}</div>
+      </div>
     </div>
   `;
 
-  document.getElementById('matchModal').style.display = 'block';
+  modal.classList.add('open');
 }
 
 function formatShortTime(value) {
@@ -871,12 +875,11 @@ function normalizeTeamName(value) {
 document.getElementById('refreshBtn').addEventListener('click', () => loadData(true));
 
 document.addEventListener('click', e => {
-  if (e.target.classList.contains('modal-close')) {
-    document.getElementById('matchModal').style.display = 'none';
-  }
-
-  if (e.target.id === 'matchModal') {
-    document.getElementById('matchModal').style.display = 'none';
+  if (
+    e.target.classList.contains('match-modal-close') ||
+    e.target.id === 'matchModal'
+  ) {
+    document.getElementById('matchModal').classList.remove('open');
   }
 });
 
