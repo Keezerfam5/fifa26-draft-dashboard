@@ -233,18 +233,7 @@ function formatShortTime(value) {
     hour12: true
   }) + ' ET';
 }
-function formatShortTime(value) {
-  if (!value) return '';
 
-  const date = new Date(value);
-
-  return date.toLocaleTimeString('en-US', {
-    timeZone: 'America/New_York',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  }) + ' ET';
-}
 
 function renderLeaderboard(rows) {
   const medals = ['🥇', '🥈', '🥉'];
