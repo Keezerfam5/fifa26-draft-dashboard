@@ -368,47 +368,47 @@ function renderKnockoutBracket(games) {
     .filter(g => g['Team 1'] && g['Team 2'])
     .sort((a, b) => new Date(a.Date) - new Date(b.Date));
 
-  const rounds = {
-    'Round of 32': [],
-    'Round of 16': [],
-    'Quarterfinal': [],
-    'Semifinal': [],
-    'Third Place': [],
-    'Final': []
+  const r32 = knockoutGames.filter(g => g.Stage === 'Round of 32');
+  const r16 = knockoutGames.filter(g => g.Stage === 'Round of 16');
+  const qf = knockoutGames.filter(g => g.Stage === 'Quarterfinal');
+  const sf = knockoutGames.filter(g => g.Stage === 'Semifinal');
+  const third = knockoutGames.filter(g => g.Stage === 'Third Place');
+  const final = knockoutGames.filter(g => g.Stage === 'Final');
+
+  const left = {
+    'Round of 32': r32.slice(0, 8),
+    'Round of 16': r16.slice(0, 4),
+    'Quarterfinals': qf.slice(0, 2),
+    'Semifinals': sf.slice(0, 1)
   };
 
-  knockoutGames.forEach(g => {
-    const stage = String(g.Stage || '').trim();
-    if (rounds[stage]) {
-      rounds[stage].push(g);
-    }
-  });
+  const right = {
+    'Semifinals': sf.slice(1, 2),
+    'Quarterfinals': qf.slice(2, 4),
+    'Round of 16': r16.slice(4, 8),
+    'Round of 32': r32.slice(8, 16)
+  };
 
   const html = `
-    <div class="bracket-scroll">
-      <div class="bracket-grid">
-        ${Object.keys(rounds).map(round => `
-          <div class="bracket-round">
-            <h3>${round}</h3>
-            ${rounds[round].length ? rounds[round].map(g => `
-              <div class="bracket-game">
-                <div class="bracket-date">${formatDate(g.Date)}</div>
+    <div class="double-bracket-scroll">
+      <div class="double-bracket">
 
-                <div class="bracket-team">
-                  <span>${teamLabel(g['Team 1'])}</span>
-                  <strong>${safe(g['Score 1'])}</strong>
-                </div>
+        <div class="bracket-side bracket-left">
+          ${Object.keys(left).map(round => bracketRound(round, left[round], 'left')).join('')}
+        </div>
 
-                <div class="bracket-team">
-                  <span>${teamLabel(g['Team 2'])}</span>
-                  <strong>${safe(g['Score 2'])}</strong>
-                </div>
+        <div class="bracket-center">
+          <h3>Championship</h3>
+          ${final.length ? final.map(g => bracketGame(g)).join('') : '<div class="champion-card">Final TBD</div>'}
 
-                <div class="bracket-status">${g.Status || ''}</div>
-              </div>
-            `).join('') : '<p class="muted">No games yet</p>'}
-          </div>
-        `).join('')}
+          <h3>Third Place</h3>
+          ${third.length ? third.map(g => bracketGame(g)).join('') : '<div class="champion-card">Third Place TBD</div>'}
+        </div>
+
+        <div class="bracket-side bracket-right">
+          ${Object.keys(right).map(round => bracketRound(round, right[round], 'right')).join('')}
+        </div>
+
       </div>
     </div>
   `;
@@ -419,11 +419,37 @@ function renderKnockoutBracket(games) {
     section.className = 'card wide';
     section.innerHTML = '<h2>Knockout Bracket</h2><div id="bracket"></div>';
 
-const ownersSection = document.getElementById('owners').closest('section');
-ownersSection.insertAdjacentElement('afterend', section);
+    const ownersSection = document.getElementById('owners').closest('section');
+    ownersSection.insertAdjacentElement('afterend', section);
   }
 
   document.getElementById('bracket').innerHTML = html;
+}
+
+function bracketRound(title, games, side) {
+  return `
+    <div class="bracket-round ${side}">
+      <h3>${title}</h3>
+      ${games.length ? games.map(g => bracketGame(g)).join('') : '<p class="muted">TBD</p>'}
+    </div>
+  `;
+}
+
+function bracketGame(g) {
+  return `
+    <div class="bracket-game">
+      <div class="bracket-date">${formatDate(g.Date)}</div>
+      <div class="bracket-team">
+        <span>${teamLabel(g['Team 1'])}</span>
+        <strong>${safe(g['Score 1'])}</strong>
+      </div>
+      <div class="bracket-team">
+        <span>${teamLabel(g['Team 2'])}</span>
+        <strong>${safe(g['Score 2'])}</strong>
+      </div>
+      <div class="bracket-status">${g.Status || ''}</div>
+    </div>
+  `;
 }
 
 function teamLabel(team) {
