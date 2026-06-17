@@ -194,7 +194,14 @@ function renderTicker(games) {
           </div>
 
           <div class="ticker-odds">
-            ${formatOdds(g)}
+function formatOdds(g) {
+  const odds = g.Odds || g.odds || g['Betting Line'] || g.Line || '';
+  const overUnder = g['O/U'] || g.OU || g['Over/Under'] || g.OverUnder || g.Total || '';
+
+  if (!odds && !overUnder) return 'Odds unavailable';
+
+  return `${odds || ''}${odds && overUnder ? ' | ' : ''}${overUnder ? 'O/U ' + overUnder : ''}`;
+}
           </div>
         </div>
       `).join('') : `<div class="ticker-empty">No matches for this date.</div>`}
@@ -253,15 +260,18 @@ function openMatchModal(game) {
       </div>
       <div class="modal-detail">
         <div class="label">Group</div>
-        <div>${game.Group || '-'}</div>
+        <div>${game.Group || game['Group Name'] || game.group || '-'}</div>
       </div>
+
       <div class="modal-detail">
         <div class="label">Odds</div>
-<div>${formatOdds(game) || 'Unavailable'}</div>
+        <div>${game.Odds || game.odds || game['Betting Line'] || game.Line || 'Unavailable'}</div>
       </div>
+
       <div class="modal-detail">
         <div class="label">Over / Under</div>
-<div>${game['O/U'] || game.OverUnder || game.Total || 'Unavailable'}</div>
+        <div>${game['O/U'] || game.OU || game['Over/Under'] || game.OverUnder || game.Total || 'Unavailable'}</div>
+      </div>
       </div>
           <h3 style="margin-top:18px;">Box Score</h3>
 
