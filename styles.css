@@ -347,60 +347,86 @@ th {
   color: #6b7280;
 }
 
-.double-bracket-scroll {
+.worldcup-bracket-scroll {
   overflow-x: auto;
-  padding-bottom: 8px;
+  padding-bottom: 10px;
 }
 
-.double-bracket {
+.worldcup-bracket {
   display: grid;
-  grid-template-columns: 1fr 280px 1fr;
+  grid-template-columns: 1fr 300px 1fr;
   gap: 28px;
-  min-width: 1500px;
+  min-width: 1700px;
   align-items: center;
 }
 
-.bracket-side {
+.bracket-wing {
   display: grid;
   grid-template-columns: repeat(4, 220px);
   gap: 22px;
   align-items: center;
 }
 
-.bracket-right {
-  direction: rtl;
+.left-wing {
+  grid-template-columns: 220px 220px 220px 220px;
 }
 
-.bracket-right .bracket-round,
-.bracket-right .bracket-game,
-.bracket-right h3 {
-  direction: ltr;
+.right-wing {
+  grid-template-columns: 220px 220px 220px 220px;
 }
 
-.bracket-round {
+.bracket-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.bracket-column h3,
+.bracket-championship h3 {
+  text-align: center;
+  font-size: 13px;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.bracket-column-games {
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-.bracket-round h3,
-.bracket-center h3 {
-  text-align: center;
-  font-size: 14px;
-  margin: 0 0 8px;
+.left-wing .bracket-column:nth-child(1) .bracket-column-games,
+.right-wing .bracket-column:nth-child(4) .bracket-column-games {
+  gap: 10px;
+}
+
+.left-wing .bracket-column:nth-child(2) .bracket-column-games,
+.right-wing .bracket-column:nth-child(3) .bracket-column-games {
+  gap: 38px;
+}
+
+.left-wing .bracket-column:nth-child(3) .bracket-column-games,
+.right-wing .bracket-column:nth-child(2) .bracket-column-games {
+  gap: 98px;
+}
+
+.left-wing .bracket-column:nth-child(4) .bracket-column-games,
+.right-wing .bracket-column:nth-child(1) .bracket-column-games {
+  gap: 220px;
 }
 
 .bracket-game,
-.champion-card {
+.champ-card,
+.bracket-placeholder {
   position: relative;
   background: white;
   border: 2px solid #4b5563;
   border-radius: 8px;
   padding: 8px;
-  min-height: 82px;
+  min-height: 78px;
 }
 
-.bracket-left .bracket-game::after {
+.left-wing .bracket-game::after {
   content: "";
   position: absolute;
   right: -24px;
@@ -409,7 +435,7 @@ th {
   border-top: 2px solid #4b5563;
 }
 
-.bracket-right .bracket-game::before {
+.right-wing .bracket-game::before {
   content: "";
   position: absolute;
   left: -24px;
@@ -418,11 +444,19 @@ th {
   border-top: 2px solid #4b5563;
 }
 
-.bracket-center {
+.bracket-championship {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
   justify-content: center;
+  align-items: stretch;
+}
+
+.trophy {
+  text-align: center;
+  font-size: 54px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 4px rgba(0,0,0,.25));
 }
 
 .bracket-team {
