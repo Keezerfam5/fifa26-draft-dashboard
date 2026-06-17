@@ -127,8 +127,10 @@ function renderHighlights(data) {
 
 function toDateKey(value) {
   const d = new Date(value);
-  if (isNaN(d)) return '';
-  return d.toISOString().slice(0, 10);
+
+  return d.toLocaleDateString('en-CA', {
+    timeZone: 'America/New_York'
+  });
 }
 
 function formatTickerDateLabel(dateKey) {
