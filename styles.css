@@ -293,11 +293,17 @@ th {
 
 .ticker-strip {
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   min-height: 100px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
 }
 
 .ticker-game {
   min-width: 220px;
+  flex: 0 0 220px;
   padding: 10px;
   border-right: 1px solid var(--border);
   cursor: pointer;
