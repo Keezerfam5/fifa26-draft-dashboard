@@ -212,15 +212,10 @@ function renderTicker(games) {
 function formatOdds(g) {
   const odds = g.Odds || '';
   const overUnder = g['O/U'] || '';
-  const provider = g['Odds Provider'] || '';
 
-  if (!odds && !overUnder) return 'Odds unavailable';
+  if (!odds) return '';
 
-  return `
-    <span>${odds || ''}</span>
-    ${overUnder ? `<span> • O/U ${overUnder}</span>` : ''}
-    ${provider ? `<span> • ${provider}</span>` : ''}
-  `;
+  return `${odds}${overUnder ? ' | O/U ' + overUnder : ''}`;
 }
 
 function formatShortTime(value) {
