@@ -197,19 +197,7 @@ function renderTicker(games) {
     </div>
   `;
 
-  if (!document.getElementById('ticker')) {
-    const ticker = document.createElement('div');
-    ticker.id = 'ticker';
-    document.querySelector('.hero').insertAdjacentElement('afterend', ticker);
-  }
 
-  document.getElementById('ticker').innerHTML = html;
-
-  document.getElementById('tickerDateSelect').addEventListener('change', e => {
-    window.selectedTickerDate = e.target.value;
-    renderTicker(games);
-  });
-}
 
   if (!document.getElementById('ticker')) {
     const ticker = document.createElement('div');
