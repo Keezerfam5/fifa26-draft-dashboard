@@ -190,7 +190,7 @@ function renderTicker(games) {
           </div>
 
         <div class="ticker-odds">
-  ${formatOdds(g)}
+  TEST
 </div>
       `).join('') : `<div class="ticker-empty">No matches for this date.</div>`}
     </div>
