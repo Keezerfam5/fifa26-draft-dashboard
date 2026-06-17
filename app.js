@@ -296,8 +296,16 @@ function renderGroupCards(rows) {
 
   const html = Object.keys(groups).sort().map(group => {
     const teams = groups[group]
-      .map(t => ({ ...t, total: Number(t['Total Pts'] || 0), groupPts: Number(t['Group Pts'] || 0) }))
-      .sort((a, b) => b.groupPts - a.groupPts || b.total - a.total);
+      .map(t => ({
+        ...t,
+        total: Number(t['Total Pts'] || 0),
+        groupPts: Number(t['Group Pts'] || 0)
+      }))
+      .sort((a, b) =>
+        b.groupPts - a.groupPts ||
+        b.total - a.total ||
+        String(a.Team).localeCompare(String(b.Team))
+      );
 
     return `
       <div class="group-card">
@@ -305,21 +313,21 @@ function renderGroupCards(rows) {
         <table>
           <thead>
             <tr>
+              <th>Place</th>
               <th>Team</th>
               <th>Owner</th>
-              <th>Group</th>
-              <th>Total</th>
+              <th>Pts</th>
               <th>Projection</th>
             </tr>
           </thead>
           <tbody>
             ${teams.map((t, i) => `
-              <tr class="${ownerClass(t.Owner)}">
+              <tr class="${ownerClass(t.Owner)} ${i < 2 ? 'projected-row' : ''}">
+                <td><strong>${i + 1}</strong></td>
                 <td>${flag(t.Team)} ${t.Team}</td>
                 <td>${t.Owner}</td>
-                <td>${t.groupPts}</td>
-                <td><strong>${t.total}</strong></td>
-                <td>${i < 2 ? '<span class="advance">Projected Advancing</span>' : ''}</td>
+                <td><strong>${t.groupPts}</strong></td>
+                <td>${i < 2 ? '<span class="advance">Advancing</span>' : '<span class="not-advancing">Outside</span>'}</td>
               </tr>
             `).join('')}
           </tbody>
