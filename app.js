@@ -244,7 +244,9 @@ function renderLeaderboard(rows) {
         <tr>
           <th>Rank</th>
           <th>Owner</th>
-          <th>Total Points</th>
+          <th>Current</th>
+          <th>Remaining</th>
+          <th>Max</th>
         </tr>
       </thead>
       <tbody>
@@ -252,7 +254,9 @@ function renderLeaderboard(rows) {
           <tr class="leader-row ${ownerClass(r.owner)}">
             <td>${medals[i] || i + 1}</td>
             <td><strong>${r.owner}</strong></td>
-            <td><strong>${r.total}</strong></td>
+            <td><strong>${r.total || 0}</strong></td>
+            <td>${r.remainingPossible || 0}</td>
+            <td><strong>${r.maxPossible || 0}</strong></td>
           </tr>
         `).join('')}
       </tbody>
