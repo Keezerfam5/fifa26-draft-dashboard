@@ -76,6 +76,7 @@ async function loadData(refresh = false) {
   const response = await fetch(url);
   const data = await response.json();
   dashboardData = data;
+  console.log('First game object:', data.games?.[0]);
 
   document.getElementById('updated').textContent =
     'Last updated: ' + new Date(data.updatedAt).toLocaleString();
