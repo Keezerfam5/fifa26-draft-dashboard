@@ -375,38 +375,31 @@ function renderKnockoutBracket(games) {
   const third = knockoutGames.filter(g => g.Stage === 'Third Place');
   const final = knockoutGames.filter(g => g.Stage === 'Final');
 
-  const left = {
-    'Round of 32': r32.slice(0, 8),
-    'Round of 16': r16.slice(0, 4),
-    'Quarterfinals': qf.slice(0, 2),
-    'Semifinals': sf.slice(0, 1)
-  };
-
-  const right = {
-    'Semifinals': sf.slice(1, 2),
-    'Quarterfinals': qf.slice(2, 4),
-    'Round of 16': r16.slice(4, 8),
-    'Round of 32': r32.slice(8, 16)
-  };
-
   const html = `
-    <div class="double-bracket-scroll">
-      <div class="double-bracket">
+    <div class="worldcup-bracket-scroll">
+      <div class="worldcup-bracket">
 
-        <div class="bracket-side bracket-left">
-          ${Object.keys(left).map(round => bracketRound(round, left[round], 'left')).join('')}
+        <div class="bracket-wing left-wing">
+          ${bracketColumn('Round of 32', r32.slice(0, 8))}
+          ${bracketColumn('Round of 16', r16.slice(0, 4))}
+          ${bracketColumn('Quarterfinals', qf.slice(0, 2))}
+          ${bracketColumn('Semifinal', sf.slice(0, 1))}
         </div>
 
-        <div class="bracket-center">
-          <h3>Championship</h3>
-          ${final.length ? final.map(g => bracketGame(g)).join('') : '<div class="champion-card">Final TBD</div>'}
+        <div class="bracket-championship">
+          <div class="trophy">🏆</div>
+          <h3>Final</h3>
+          ${final.length ? final.map(g => bracketGame(g)).join('') : '<div class="champ-card">Final TBD</div>'}
 
-          <h3>Third Place</h3>
-          ${third.length ? third.map(g => bracketGame(g)).join('') : '<div class="champion-card">Third Place TBD</div>'}
+          <h3>3rd Place</h3>
+          ${third.length ? third.map(g => bracketGame(g)).join('') : '<div class="champ-card">3rd Place TBD</div>'}
         </div>
 
-        <div class="bracket-side bracket-right">
-          ${Object.keys(right).map(round => bracketRound(round, right[round], 'right')).join('')}
+        <div class="bracket-wing right-wing">
+          ${bracketColumn('Semifinal', sf.slice(1, 2))}
+          ${bracketColumn('Quarterfinals', qf.slice(2, 4))}
+          ${bracketColumn('Round of 16', r16.slice(4, 8))}
+          ${bracketColumn('Round of 32', r32.slice(8, 16))}
         </div>
 
       </div>
@@ -426,11 +419,13 @@ function renderKnockoutBracket(games) {
   document.getElementById('bracket').innerHTML = html;
 }
 
-function bracketRound(title, games, side) {
+function bracketColumn(title, games) {
   return `
-    <div class="bracket-round ${side}">
+    <div class="bracket-column">
       <h3>${title}</h3>
-      ${games.length ? games.map(g => bracketGame(g)).join('') : '<p class="muted">TBD</p>'}
+      <div class="bracket-column-games">
+        ${games.length ? games.map(g => bracketGame(g)).join('') : '<div class="bracket-placeholder">TBD</div>'}
+      </div>
     </div>
   `;
 }
