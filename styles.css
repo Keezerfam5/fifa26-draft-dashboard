@@ -474,14 +474,14 @@ th {
   align-items: stretch;
 }
 
-.trophy {
+.bracket-trophy {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-bottom: 10px;
 }
 
-.trophy img {
+.bracket-trophy img {
   height: 140px;
   width: auto;
   filter:
