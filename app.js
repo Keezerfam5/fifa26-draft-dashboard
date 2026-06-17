@@ -387,7 +387,9 @@ function renderKnockoutBracket(games) {
         </div>
 
         <div class="bracket-championship">
-          <div class="trophy">🏆</div>
+<div class="trophy">
+  <img src="/world-cup-trophy.png" alt="World Cup Trophy">
+</div>
           <h3>Final</h3>
           ${final.length ? final.map(g => bracketGame(g)).join('') : '<div class="champ-card">Final TBD</div>'}
 
