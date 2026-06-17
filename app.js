@@ -257,12 +257,45 @@ function openMatchModal(game) {
       </div>
       <div class="modal-detail">
         <div class="label">Odds</div>
-        <div>${game.Odds || 'Unavailable'}</div>
+<div>${formatOdds(game) || 'Unavailable'}</div>
       </div>
       <div class="modal-detail">
         <div class="label">Over / Under</div>
-        <div>${game['O/U'] || 'Unavailable'}</div>
+<div>${game['O/U'] || game.OverUnder || game.Total || 'Unavailable'}</div>
       </div>
+          <h3 style="margin-top:18px;">Box Score</h3>
+
+    <div class="modal-detail-grid">
+      <div class="modal-detail">
+        <div class="label">Goalscorers</div>
+        <div>${game.Goalscorers || 'Coming soon'}</div>
+      </div>
+
+      <div class="modal-detail">
+        <div class="label">Cards</div>
+        <div>${game.Cards || 'Coming soon'}</div>
+      </div>
+
+      <div class="modal-detail">
+        <div class="label">Possession</div>
+        <div>${game.Possession || 'Coming soon'}</div>
+      </div>
+
+      <div class="modal-detail">
+        <div class="label">Shots</div>
+        <div>${game.Shots || 'Coming soon'}</div>
+      </div>
+
+      <div class="modal-detail">
+        <div class="label">Lineups</div>
+        <div>${game.Lineups || 'Coming soon'}</div>
+      </div>
+
+      <div class="modal-detail">
+        <div class="label">Box Score API</div>
+        <div>${game.BoxScore || 'Not connected yet'}</div>
+      </div>
+    </div>
     </div>
   `;
 
