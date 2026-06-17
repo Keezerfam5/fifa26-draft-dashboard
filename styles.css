@@ -699,3 +699,44 @@ th {
   background: #E4DFEC;
   color: #000;
 }
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+}
+
+.modal-content {
+  background: white;
+  width: min(700px, 95vw);
+  margin: 5vh auto;
+  padding: 24px;
+  border-radius: 18px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.modal-close {
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.modal-team {
+  display: flex;
+  justify-content: space-between;
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.modal-row {
+  margin-bottom: 8px;
+}
+
+.modal-label {
+  font-weight: 700;
+  color: #6b7280;
+}
