@@ -264,44 +264,25 @@ function renderLeaderboard(rows) {
   `;
 }
 
-function renderOwnerCards(rows, teams) {
-  document.getElementById('owners').innerHTML = `
-    <div class="owner-grid">
-      ${rows.map(r => {
-        const ownerTeams = teams
-          .filter(t => t.Owner === r.owner)
-          .sort((a, b) => Number(b['Total Pts'] || 0) - Number(a['Total Pts'] || 0));
-
-        return `
-          <div class="owner-card ${ownerClass(r.owner)}">
-            <h3>${r.owner}</h3>
-            <div class="points">${r.total} pts</div>
-            <ul>
-              ${ownerTeams.map(t => `
-                <li>
-                  <span>${flag(t.Team)} ${t.Team}</span>
-                  <strong>${t['Total Pts'] || 0}</strong>
-                </li>
-              `).join('')}
-            </ul>
-          </div>
-        `;
-      }).join('')}
-    </div>
-  `;
-}
-
 function renderGroupCards(rows) {
   const groups = groupBy(rows, 'Group');
+  const games = dashboardData?.games || [];
+  const records = buildTeamRecords(games);
 
   const html = Object.keys(groups).sort().map(group => {
     const teams = groups[group]
-      .map(t => ({
-        ...t,
-        total: Number(t['Total Pts'] || 0),
-        groupPts: Number(t['Group Pts'] || 0)
-      }))
+      .map(t => {
+        const projection = calculateAdvancementProjection(t, groups[group], games, records);
+
+        return {
+          ...t,
+          total: Number(t['Total Pts'] || 0),
+          groupPts: Number(t['Group Pts'] || 0),
+          projection
+        };
+      })
       .sort((a, b) =>
+        b.projection - a.projection ||
         b.groupPts - a.groupPts ||
         b.total - a.total ||
         String(a.Team).localeCompare(String(b.Team))
@@ -317,7 +298,7 @@ function renderGroupCards(rows) {
               <th>Team</th>
               <th>Owner</th>
               <th>Pts</th>
-              <th>Projection</th>
+              <th>Adv %</th>
             </tr>
           </thead>
           <tbody>
@@ -327,7 +308,11 @@ function renderGroupCards(rows) {
                 <td>${flag(t.Team)} ${t.Team}</td>
                 <td>${t.Owner}</td>
                 <td><strong>${t.groupPts}</strong></td>
-                <td>${i < 2 ? '<span class="advance">Advancing</span>' : '<span class="not-advancing">Outside</span>'}</td>
+                <td>
+                  <span class="${t.projection >= 50 ? 'advance' : 'not-advancing'}">
+                    ${t.projection}%
+                  </span>
+                </td>
               </tr>
             `).join('')}
           </tbody>
@@ -340,13 +325,42 @@ function renderGroupCards(rows) {
     const section = document.createElement('section');
     section.id = 'groups-section';
     section.className = 'card wide';
-    section.innerHTML = '<h2>Group Standings & Projected Advancement</h2><div id="groups"></div>';
+    section.innerHTML = '<h2>Group Standings & Advancement Projection</h2><div id="groups"></div>';
 
     const teamsSection = document.getElementById('teams').closest('section');
     teamsSection.parentNode.insertBefore(section, teamsSection);
   }
 
   document.getElementById('groups').innerHTML = `<div class="group-grid">${html}</div>`;
+}
+
+function calculateAdvancementProjection(team, groupTeams, games, records) {
+  const teamName = team.Team;
+  const currentPts = Number(team['Group Pts'] || 0);
+  const rec = records[teamName] || { w: 0, l: 0, d: 0 };
+
+  const played = rec.w + rec.l + rec.d;
+  const remaining = Math.max(0, 3 - played);
+
+  let projectedPts = currentPts + remaining * 1.5;
+
+  const groupMax = groupTeams.map(t => {
+    const r = records[t.Team] || { w: 0, l: 0, d: 0 };
+    const p = r.w + r.l + r.d;
+    const rem = Math.max(0, 3 - p);
+    return Number(t['Group Pts'] || 0) + rem * 1.5;
+  });
+
+  const sorted = [...groupMax].sort((a, b) => b - a);
+  const secondPlaceTarget = sorted[1] || 0;
+
+  let percentage = 50 + ((projectedPts - secondPlaceTarget) * 18);
+
+  if (currentPts >= secondPlaceTarget) percentage += 10;
+  if (remaining === 0 && projectedPts >= secondPlaceTarget) percentage = 95;
+  if (remaining === 0 && projectedPts < secondPlaceTarget) percentage = 5;
+
+  return Math.max(1, Math.min(99, Math.round(percentage)));
 }
 
 function renderMatchCenter(rows) {
