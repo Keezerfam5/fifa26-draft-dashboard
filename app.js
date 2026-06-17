@@ -193,16 +193,9 @@ function renderTicker(games) {
             <strong>${safe(g['Score 2'])}</strong>
           </div>
 
-          <div class="ticker-odds">
-function formatOdds(g) {
-  const odds = g.Odds || g.odds || g['Betting Line'] || g.Line || '';
-  const overUnder = g['O/U'] || g.OU || g['Over/Under'] || g.OverUnder || g.Total || '';
-
-  if (!odds && !overUnder) return 'Odds unavailable';
-
-  return `${odds || ''}${odds && overUnder ? ' | ' : ''}${overUnder ? 'O/U ' + overUnder : ''}`;
-}
-          </div>
+<div class="ticker-odds">
+  ${formatOdds(g)}
+</div>
         </div>
       `).join('') : `<div class="ticker-empty">No matches for this date.</div>`}
     </div>
@@ -224,12 +217,12 @@ function formatOdds(g) {
   });
 }
 function formatOdds(g) {
-  const odds = g.Odds || '';
-  const overUnder = g['O/U'] || '';
+  const odds = g.Odds || g.odds || g['Betting Line'] || g.Line || '';
+  const overUnder = g['O/U'] || g.OU || g['Over/Under'] || g.OverUnder || g.Total || '';
 
-  if (!odds) return '';
+  if (!odds && !overUnder) return 'Odds unavailable';
 
-  return `${odds}${overUnder ? ' | O/U ' + overUnder : ''}`;
+  return `${odds || ''}${odds && overUnder ? ' | ' : ''}${overUnder ? 'O/U ' + overUnder : ''}`;
 }
 
 function openMatchModal(game) {
