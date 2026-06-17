@@ -509,7 +509,8 @@ function teamLabelWithOwner(team, context = {}) {
     t => normalizeTeamName(t.Team) === normalizeTeamName(resolved)
   );
 
-  const owner = teamRow?.Owner || '';
+const owner = teamRow?.Owner || '';
+const ownerCss = ownerClass(owner);
 
   const lower = String(resolved).toLowerCase();
 
@@ -524,7 +525,9 @@ function teamLabelWithOwner(team, context = {}) {
   return `
     <div class="bracket-team-info">
       <div>${flag(resolved)} ${resolved}</div>
-      <div class="bracket-owner">${owner}</div>
+<div class="bracket-owner ${ownerCss}">
+  ${owner}
+</div>
     </div>
   `;
 }
