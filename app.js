@@ -209,7 +209,32 @@ function renderTicker(games) {
     renderTicker(games);
   });
 }
+function formatOdds(g) {
+  const odds = g.Odds || '';
+  const overUnder = g['O/U'] || '';
+  const provider = g['Odds Provider'] || '';
 
+  if (!odds && !overUnder) return 'Odds unavailable';
+
+  return `
+    <span>${odds || ''}</span>
+    ${overUnder ? `<span> • O/U ${overUnder}</span>` : ''}
+    ${provider ? `<span> • ${provider}</span>` : ''}
+  `;
+}
+
+function formatShortTime(value) {
+  if (!value) return '';
+
+  const date = new Date(value);
+
+  return date.toLocaleTimeString('en-US', {
+    timeZone: 'America/New_York',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  }) + ' ET';
+}
 function formatShortTime(value) {
   if (!value) return '';
 
