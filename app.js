@@ -264,6 +264,33 @@ function renderLeaderboard(rows) {
   `;
 }
 
+function renderOwnerCards(rows, teams) {
+  document.getElementById('owners').innerHTML = `
+    <div class="owner-grid">
+      ${rows.map(r => {
+        const ownerTeams = teams
+          .filter(t => t.Owner === r.owner)
+          .sort((a, b) => Number(b['Total Pts'] || 0) - Number(a['Total Pts'] || 0));
+
+        return `
+          <div class="owner-card ${ownerClass(r.owner)}">
+            <h3>${r.owner}</h3>
+            <div class="points">${r.total} pts</div>
+            <ul>
+              ${ownerTeams.map(t => `
+                <li>
+                  <span>${flag(t.Team)} ${t.Team}</span>
+                  <strong>${t['Total Pts'] || 0}</strong>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
 function renderGroupCards(rows) {
   const groups = groupBy(rows, 'Group');
   const games = dashboardData?.games || [];
