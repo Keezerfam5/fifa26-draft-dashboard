@@ -347,51 +347,82 @@ th {
   color: #6b7280;
 }
 
-.bracket-scroll {
+.double-bracket-scroll {
   overflow-x: auto;
-  padding: 12px 0;
+  padding-bottom: 8px;
 }
 
-.bracket-grid {
+.double-bracket {
   display: grid;
-  grid-template-columns: repeat(6, 240px);
-  gap: 34px;
-  min-width: 1550px;
+  grid-template-columns: 1fr 280px 1fr;
+  gap: 28px;
+  min-width: 1500px;
   align-items: center;
+}
+
+.bracket-side {
+  display: grid;
+  grid-template-columns: repeat(4, 220px);
+  gap: 22px;
+  align-items: center;
+}
+
+.bracket-right {
+  direction: rtl;
+}
+
+.bracket-right .bracket-round,
+.bracket-right .bracket-game,
+.bracket-right h3 {
+  direction: ltr;
 }
 
 .bracket-round {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
 }
 
-.bracket-round h3 {
+.bracket-round h3,
+.bracket-center h3 {
   text-align: center;
-  margin-bottom: 8px;
-  font-size: 15px;
+  font-size: 14px;
+  margin: 0 0 8px;
 }
 
-.bracket-game {
+.bracket-game,
+.champion-card {
   position: relative;
   background: white;
   border: 2px solid #4b5563;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 8px;
   min-height: 82px;
 }
 
-.bracket-game::after {
+.bracket-left .bracket-game::after {
   content: "";
   position: absolute;
-  right: -35px;
+  right: -24px;
   top: 50%;
-  width: 35px;
+  width: 24px;
   border-top: 2px solid #4b5563;
 }
 
-.bracket-round:last-child .bracket-game::after {
-  display: none;
+.bracket-right .bracket-game::before {
+  content: "";
+  position: absolute;
+  left: -24px;
+  top: 50%;
+  width: 24px;
+  border-top: 2px solid #4b5563;
+}
+
+.bracket-center {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  justify-content: center;
 }
 
 .bracket-team {
