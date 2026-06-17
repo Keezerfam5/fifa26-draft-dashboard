@@ -611,3 +611,25 @@ th {
     margin-right: 4px;
   }
 }
+.highlight-card {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  align-content: center;
+  justify-items: start;
+}
+
+.highlight-card .label,
+.highlight-card .big,
+.highlight-card div {
+  width: 100%;
+}
+
+.highlight-card .big {
+  display: block !important;
+  margin: 0;
+}
+
+.highlight-card .big + div {
+  display: block !important;
+  margin-top: 2px;
+}
