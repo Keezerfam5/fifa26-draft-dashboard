@@ -135,7 +135,7 @@ h2, h3 {
   font-weight: 900;
 }
 
-.highlight-card.trophy {
+.leader-highlight {
   background: linear-gradient(135deg, #fef3c7, #ffffff);
 }
 
@@ -632,4 +632,25 @@ th {
 .highlight-card .big + div {
   display: block !important;
   margin-top: 2px;
+}
+.leader-highlight {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+}
+
+.leader-highlight .label,
+.leader-highlight .big,
+.leader-highlight .subtext {
+  display: block !important;
+  width: 100% !important;
+}
+
+.leader-highlight .big {
+  margin: 4px 0 0 !important;
+}
+
+.leader-highlight .subtext {
+  margin-top: 2px !important;
 }
