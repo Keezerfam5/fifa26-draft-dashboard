@@ -654,3 +654,18 @@ th {
 .leader-highlight .subtext {
   margin-top: 2px !important;
 }
+.bracket-team-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bracket-owner {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.bracket-game .flag {
+  margin-right: 4px;
+}
