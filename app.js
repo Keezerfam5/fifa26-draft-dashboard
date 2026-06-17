@@ -471,7 +471,7 @@ function renderTeams(rows) {
           const newGroup = r.Group !== previousGroup;
           previousGroup = r.Group;
 
-          const rec = records[r.Team] || { w: 0, l: 0, d: 0 };
+const rec = records[normalizeTeamName(r.Team)] || { w: 0, l: 0, d: 0 };
 
           return `
             <tr class="${ownerClass(r.Owner)} ${newGroup ? 'group-divider' : ''}">
@@ -496,8 +496,11 @@ function buildTeamRecords(games) {
   games.forEach(g => {
     if (!isCompleted(g)) return;
 
-    const t1 = g['Team 1'];
-    const t2 = g['Team 2'];
+    const t1Display = g['Team 1'];
+    const t2Display = g['Team 2'];
+    const t1 = normalizeTeamName(t1Display);
+    const t2 = normalizeTeamName(t2Display);
+
     const s1 = Number(g['Score 1']);
     const s2 = Number(g['Score 2']);
 
@@ -551,6 +554,42 @@ function formatDate(value) {
 
 function safe(value) {
   return value === undefined || value === null || value === '' ? '' : value;
+}
+
+function normalizeTeamName(value) {
+  let v = String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[()]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+
+  const aliases = {
+    'usa': 'united states',
+    'u s a': 'united states',
+    'united states': 'united states',
+    'united states of america': 'united states',
+
+    'turkey': 'turkiye',
+    'türkiye': 'turkiye',
+    'turkiye': 'turkiye',
+
+    'bosnia': 'bosnia',
+    'bosnia herzegovina': 'bosnia',
+    'bosnia and herzegovina': 'bosnia',
+
+    'curacao': 'curacao',
+    'curaçao': 'curacao',
+
+    'cote d ivoire': 'ivory coast',
+    'ivory coast': 'ivory coast',
+
+    'dr congo': 'congo',
+    'congo dr': 'congo',
+    'democratic republic of congo': 'congo'
+  };
+
+  return aliases[v] || v;
 }
 
 document.getElementById('refreshBtn').addEventListener('click', () => loadData(true));
