@@ -139,6 +139,26 @@ h2, h3 {
   background: linear-gradient(135deg, #fef3c7, #ffffff);
 }
 
+.highlight-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.highlight-card .label {
+  display: block;
+}
+
+.highlight-card .big {
+  display: block;
+  line-height: 1.1;
+}
+
+.highlight-card .big + div {
+  display: block;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
