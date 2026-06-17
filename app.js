@@ -387,9 +387,9 @@ const context = {
 
         <div class="bracket-wing left-wing">
 ${bracketColumn('Round of 32', r32.slice(0, 8), context)}
-          ${bracketColumn('Round of 16', r16.slice(0, 4)context)}
-          ${bracketColumn('Quarterfinals', qf.slice(0, 2)context)}
-          ${bracketColumn('Semifinal', sf.slice(0, 1)context)}
+          ${bracketColumn('Round of 16', r16.slice(0, 4),context)}
+          ${bracketColumn('Quarterfinals', qf.slice(0, 2),context)}
+          ${bracketColumn('Semifinal', sf.slice(0, 1),context)}
         </div>
 
         <div class="bracket-championship">
