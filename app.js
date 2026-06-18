@@ -194,6 +194,10 @@ function renderTicker(games) {
             <strong>${safe(g['Score 2'])}</strong>
           </div>
 
+<div class="ticker-location">
+  ${g.Location || g.Venue || ''}
+</div>
+
 <div class="ticker-odds">
   ${formatOdds(g)}
 </div>
