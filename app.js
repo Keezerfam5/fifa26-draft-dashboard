@@ -1049,12 +1049,20 @@ function normalizeTeamName(value) {
 document.getElementById('refreshBtn').addEventListener('click', () => loadData(true));
 
 document.addEventListener('click', e => {
-  if (
-    e.target.classList.contains('match-modal-close') ||
-    e.target.id === 'matchModal'
-  ) {
-    document.getElementById('matchModal').classList.remove('open');
+
+  if (e.target.classList.contains('match-modal-close')) {
+    document.getElementById('matchModal')?.classList.remove('open');
+    document.getElementById('teamModal')?.classList.remove('open');
   }
+
+  if (e.target.id === 'matchModal') {
+    document.getElementById('matchModal')?.classList.remove('open');
+  }
+
+  if (e.target.id === 'teamModal') {
+    document.getElementById('teamModal')?.classList.remove('open');
+  }
+
 });
 
 loadData(false);
