@@ -270,6 +270,15 @@ function openMatchModal(game) {
         <div class="label">Over / Under</div>
         <div>${game['O/U'] || game.OU || game['Over/Under'] || game.OverUnder || game.Total || 'Unavailable'}</div>
       </div>
+            <div class="modal-detail">
+        <div class="label">Location</div>
+        <div>${game.Location || game.Venue || 'Unavailable'}</div>
+      </div>
+
+      <div class="modal-detail">
+        <div class="label">Weather at Kickoff</div>
+        <div>${game.Weather || 'Not connected yet'}</div>
+      </div>
       </div>
           <h3 style="margin-top:18px;">Box Score</h3>
 
