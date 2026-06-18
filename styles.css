@@ -825,3 +825,14 @@ th {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.team-link {
+  cursor: pointer;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.team-link:hover {
+  opacity: .75;
+}
