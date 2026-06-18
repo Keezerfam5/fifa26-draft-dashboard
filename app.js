@@ -319,6 +319,112 @@ function openMatchModal(game) {
   modal.classList.add('open');
 }
 
+function openTeamModal(teamName) {
+  const modal = document.getElementById('teamModal');
+  const body = document.getElementById('teamModalBody');
+
+  const teamKey = normalizeTeamName(teamName);
+  const team = (dashboardData.teams || []).find(t => normalizeTeamName(t.Team) === teamKey);
+  const games = dashboardData.games || [];
+  const records = buildTeamRecords(games);
+  const rec = records[teamKey] || { w: 0, l: 0, d: 0 };
+
+  const teamGames = games
+    .filter(g =>
+      normalizeTeamName(g['Team 1']) === teamKey ||
+      normalizeTeamName(g['Team 2']) === teamKey
+    )
+    .sort((a, b) => new Date(a.Date) - new Date(b.Date));
+
+  const completed = teamGames.filter(isCompleted);
+  const upcoming = teamGames.filter(g => !isCompleted(g));
+
+  const stats = summarizeTeamStats(teamName, completed);
+
+  body.innerHTML = `
+    <h2>${flag(team?.Team || teamName)} ${team?.Team || teamName}</h2>
+
+    <div class="modal-detail-grid">
+      <div class="modal-detail"><div class="label">Owner</div><div>${team?.Owner || '-'}</div></div>
+      <div class="modal-detail"><div class="label">Group</div><div>${team?.Group || '-'}</div></div>
+      <div class="modal-detail"><div class="label">Record</div><div>${rec.w}-${rec.l}-${rec.d}</div></div>
+      <div class="modal-detail"><div class="label">Group Points</div><div>${team?.['Group Pts'] || 0}</div></div>
+      <div class="modal-detail"><div class="label">Knockout Points</div><div>${team?.['Knockout Pts'] || 0}</div></div>
+      <div class="modal-detail"><div class="label">Total Points</div><div>${team?.['Total Pts'] || 0}</div></div>
+    </div>
+
+    <h3>Team Stats</h3>
+    <div class="modal-detail-grid">
+      <div class="modal-detail"><div class="label">Goals For</div><div>${stats.gf}</div></div>
+      <div class="modal-detail"><div class="label">Goals Against</div><div>${stats.ga}</div></div>
+      <div class="modal-detail"><div class="label">Goal Difference</div><div>${stats.gd}</div></div>
+      <div class="modal-detail"><div class="label">Matches Played</div><div>${completed.length}</div></div>
+    </div>
+
+    <h3>Completed Matches</h3>
+    ${completed.length ? completed.map(teamGameRow).join('') : '<p class="muted">No completed matches yet.</p>'}
+
+    <h3>Upcoming Matches</h3>
+    ${upcoming.length ? upcoming.map(teamGameRow).join('') : '<p class="muted">No upcoming matches found.</p>'}
+
+    <h3>Roster / Lineups</h3>
+    ${extractTeamLineups(teamName, completed) || '<p class="muted">Roster data not available yet.</p>'}
+  `;
+
+  modal.classList.add('open');
+}
+
+function summarizeTeamStats(teamName, games) {
+  const key = normalizeTeamName(teamName);
+  let gf = 0;
+  let ga = 0;
+
+  games.forEach(g => {
+    const t1 = normalizeTeamName(g['Team 1']);
+    const t2 = normalizeTeamName(g['Team 2']);
+    const s1 = Number(g['Score 1']);
+    const s2 = Number(g['Score 2']);
+
+    if (isNaN(s1) || isNaN(s2)) return;
+
+    if (t1 === key) {
+      gf += s1;
+      ga += s2;
+    }
+
+    if (t2 === key) {
+      gf += s2;
+      ga += s1;
+    }
+  });
+
+  return { gf, ga, gd: gf - ga };
+}
+
+function teamGameRow(g) {
+  return `
+    <div class="match-card" onclick="openMatchModal(${JSON.stringify(g).replace(/"/g,'&quot;')})">
+      <div class="match-date">${formatDate(g.Date)}</div>
+      <div class="match-teams">
+        <span>${teamWithFlag(g['Team 1'])}</span>
+        <strong>${safe(g['Score 1'])} - ${safe(g['Score 2'])}</strong>
+        <span>${teamWithFlag(g['Team 2'])}</span>
+      </div>
+      <div class="match-status">${g.Status || ''}</div>
+    </div>
+  `;
+}
+
+function extractTeamLineups(teamName, games) {
+  const key = normalizeTeamName(teamName);
+
+  return games
+    .map(g => g.Lineups || '')
+    .filter(Boolean)
+    .filter(lineup => normalizeTeamName(lineup).includes(key))
+    .join('<hr>');
+}
+
 function formatShortTime(value) {
   if (!value) return '';
 
