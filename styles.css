@@ -818,3 +818,10 @@ th {
   letter-spacing: .06em;
   margin-bottom: 4px;
 }
+.ticker-location {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
