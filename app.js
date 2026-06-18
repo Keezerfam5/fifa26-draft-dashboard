@@ -105,7 +105,11 @@ function renderHighlights(data) {
 </div>
       <div class="highlight-card">
         <div class="label">Most Valuable Team</div>
-        <div class="big">${bestTeam ? flag(bestTeam.Team) + ' ' + bestTeam.Team : '-'}</div>
+        <div class="big">${bestTeam
+  ? `<span class="team-link" onclick="openTeamModal('${bestTeam.Team}')">
+       ${flag(bestTeam.Team)} ${bestTeam.Team}
+     </span>`
+  : '-'}</div>
         <div>${bestTeam ? bestTeam.Owner + ' • ' + bestTeam['Total Pts'] + ' pts' : ''}</div>
       </div>
       <div class="highlight-card">
@@ -510,7 +514,9 @@ function renderOwnerCards(rows, teams) {
             <ul>
               ${ownerTeams.map(t => `
                 <li>
-                  <span>${flag(t.Team)} ${t.Team}</span>
+                  <span class="team-link" onclick="openTeamModal('${t.Team}')">
+  ${flag(t.Team)} ${t.Team}
+</span>
                   <strong>${t['Total Pts'] || 0}</strong>
                 </li>
               `).join('')}
@@ -563,7 +569,11 @@ function renderGroupCards(rows) {
             ${teams.map((t, i) => `
               <tr class="${ownerClass(t.Owner)} ${i < 2 ? 'projected-row' : ''}">
                 <td><strong>${i + 1}</strong></td>
-                <td>${flag(t.Team)} ${t.Team}</td>
+               <td>
+  <span class="team-link" onclick="openTeamModal('${t.Team}')">
+    ${flag(t.Team)} ${t.Team}
+  </span>
+</td>
                 <td>${t.Owner}</td>
                 <td><strong>${t.groupPts}</strong></td>
                 <td>
@@ -727,7 +737,11 @@ const ownerCss = ownerClass(owner);
 
   return `
     <div class="bracket-team-info">
-      <div>${flag(resolved)} ${resolved}</div>
+      <div>
+  <span class="team-link" onclick="openTeamModal('${resolved}')">
+    ${flag(resolved)} ${resolved}
+  </span>
+</div>
 <div class="bracket-owner ${ownerCss}">
   ${owner}
 </div>
@@ -804,7 +818,7 @@ const rec = records[normalizeTeamName(teamName)] || { w: 0, l: 0, d: 0 };
   let projectedPts = currentPts + remaining * 1.5;
 
   const groupMax = groupTeams.map(t => {
-    const r = records[t.Team] || { w: 0, l: 0, d: 0 };
+    const r = records[normalizeTeamName(t.Team)] || { w: 0, l: 0, d: 0 };
     const p = r.w + r.l + r.d;
     const rem = Math.max(0, 3 - p);
     return Number(t['Group Pts'] || 0) + rem * 1.5;
@@ -910,7 +924,11 @@ const rec = records[normalizeTeamName(r.Team)] || { w: 0, l: 0, d: 0 };
 
           return `
             <tr class="${ownerClass(r.Owner)} ${newGroup ? 'group-divider' : ''}">
-              <td>${flag(r.Team)} ${r.Team}</td>
+              <td>
+  <span class="team-link" onclick="openTeamModal('${r.Team}')">
+    ${flag(r.Team)} ${r.Team}
+  </span>
+</td>
               <td>${r.Owner}</td>
               <td><strong>${r.Group}</strong></td>
               <td>${rec.w}-${rec.l}-${rec.d}</td>
