@@ -81,7 +81,7 @@ async function loadData(refresh = false) {
   document.getElementById('updated').textContent =
     'Last updated: ' + new Date(data.updatedAt).toLocaleString();
 
-  renderHighlights(data);
+  //renderHighlights(data);
   renderTicker(data.games || []);
   renderLeaderboard(data.leaderboard || []);
   renderOwnerCards(data.leaderboard || [], data.teams || []);
