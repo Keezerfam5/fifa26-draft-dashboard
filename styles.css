@@ -996,3 +996,10 @@ th {
   background: #111827;
   color: white;
 }
+.owner-card {
+  cursor: default;
+}
+
+.owner-card-header {
+  cursor: pointer;
+}
