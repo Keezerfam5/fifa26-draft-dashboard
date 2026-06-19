@@ -383,6 +383,7 @@ function openOwnerModal(ownerName) {
   const body = document.getElementById('ownerModalBody');
 
   const owner = (dashboardData.leaderboard || []).find(o => o.owner === ownerName);
+  console.log(owner);
   const teams = (dashboardData.teams || [])
     .filter(t => t.Owner === ownerName)
     .sort((a, b) => Number(b['Total Pts'] || 0) - Number(a['Total Pts'] || 0));
@@ -478,8 +479,6 @@ function openOwnerModal(ownerName) {
   `;
 
   modal.classList.add('open');
-
-  console.log(owner);
 }
 
 function summarizeTeamStats(teamName, games) {
