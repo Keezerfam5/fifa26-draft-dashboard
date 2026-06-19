@@ -836,3 +836,20 @@ th {
 .team-link:hover {
   opacity: .75;
 }
+@media (max-width: 900px) {
+  #teams {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #teams table {
+    min-width: 720px;
+  }
+
+  #teams th,
+  #teams td {
+    white-space: nowrap;
+    font-size: 11px;
+    padding: 7px;
+  }
+}
