@@ -421,7 +421,10 @@ function openOwnerModal(ownerName) {
       <div class="modal-detail"><div class="label">Current Points</div><div>${owner?.total || 0}</div></div>
       <div class="modal-detail"><div class="label">Remaining Possible</div><div>${owner?.remainingPossible || 0}</div></div>
       <div class="modal-detail"><div class="label">Max Possible</div><div>${owner?.maxPossible || 0}</div></div>
-      <div class="modal-detail"><div class="label">Teams Drafted</div><div>${totalTeams}</div></div>
+<div class="modal-detail">
+  <div class="label">Title %</div>
+  <div>${owner?.titlePct || owner?.titlePercent || 0}%</div>
+</div>
       <div class="modal-detail"><div class="label">Projected Advancing</div><div>${advancingTeams.length}</div></div>
       <div class="modal-detail"><div class="label">At Risk</div><div>${atRiskTeams.length}</div></div>
     </div>
