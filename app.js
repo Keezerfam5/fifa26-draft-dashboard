@@ -405,6 +405,40 @@ function summarizeTeamStats(teamName, games) {
   return { gf, ga, gd: gf - ga };
 }
 
+function getTeamGoalStats(teamName, games) {
+  const key = normalizeTeamName(teamName);
+  let gf = 0;
+  let ga = 0;
+
+  games.forEach(g => {
+    if (!isCompleted(g)) return;
+    if (String(g.Stage || '').toLowerCase() !== 'group') return;
+
+    const t1 = normalizeTeamName(g['Team 1']);
+    const t2 = normalizeTeamName(g['Team 2']);
+    const s1 = Number(g['Score 1']);
+    const s2 = Number(g['Score 2']);
+
+    if (isNaN(s1) || isNaN(s2)) return;
+
+    if (t1 === key) {
+      gf += s1;
+      ga += s2;
+    }
+
+    if (t2 === key) {
+      gf += s2;
+      ga += s1;
+    }
+  });
+
+  return {
+    gf,
+    ga,
+    gd: gf - ga
+  };
+}
+
 function teamGameRow(g) {
   return `
     <div class="match-card" onclick="openMatchModal(${JSON.stringify(g).replace(/"/g,'&quot;')})">
@@ -538,18 +572,25 @@ function renderGroupCards(rows) {
       .map(t => {
         const projection = calculateAdvancementProjection(t, groups[group], games, records);
 
-        return {
-          ...t,
-          total: Number(t['Total Pts'] || 0),
-          groupPts: Number(t['Group Pts'] || 0),
-          projection
-        };
+const goalStats = getTeamGoalStats(t.Team, games);
+
+return {
+  ...t,
+  total: Number(t['Total Pts'] || 0),
+  groupPts: Number(t['Group Pts'] || 0),
+  gf: goalStats.gf,
+  ga: goalStats.ga,
+  gd: goalStats.gd,
+  projection
+};
       })
       .sort((a, b) =>
-        b.projection - a.projection ||
-        b.groupPts - a.groupPts ||
-        b.total - a.total ||
-        String(a.Team).localeCompare(String(b.Team))
+b.groupPts - a.groupPts ||
+b.gd - a.gd ||
+b.gf - a.gf ||
+b.projection - a.projection ||
+b.total - a.total ||
+String(a.Team).localeCompare(String(b.Team))
       );
 
     return `
@@ -561,8 +602,9 @@ function renderGroupCards(rows) {
               <th>Place</th>
               <th>Team</th>
               <th>Owner</th>
-              <th>Pts</th>
-              <th>Adv %</th>
+<th>Pts</th>
+<th>PD</th>
+<th>Adv %</th>
             </tr>
           </thead>
           <tbody>
@@ -575,8 +617,9 @@ function renderGroupCards(rows) {
   </span>
 </td>
                 <td>${t.Owner}</td>
-                <td><strong>${t.groupPts}</strong></td>
-                <td>
+<td><strong>${t.groupPts}</strong></td>
+<td>${t.gd > 0 ? '+' + t.gd : t.gd}</td>
+<td>
                   <span class="${t.projection >= 50 ? 'advance' : 'not-advancing'}">
                     ${t.projection}%
                   </span>
@@ -910,6 +953,7 @@ function renderTeams(rows) {
           <th>Owner</th>
           <th>Group</th>
           <th>Record</th>
+          <th>PD</th>
           <th>Group Pts</th>
           <th>Knockout Pts</th>
           <th>Total</th>
@@ -921,6 +965,7 @@ function renderTeams(rows) {
           previousGroup = r.Group;
 
 const rec = records[normalizeTeamName(r.Team)] || { w: 0, l: 0, d: 0 };
+          const goalStats = getTeamGoalStats(r.Team, dashboardData?.games || []);
 
           return `
             <tr class="${ownerClass(r.Owner)} ${newGroup ? 'group-divider' : ''}">
@@ -932,6 +977,7 @@ const rec = records[normalizeTeamName(r.Team)] || { w: 0, l: 0, d: 0 };
               <td>${r.Owner}</td>
               <td><strong>${r.Group}</strong></td>
               <td>${rec.w}-${rec.l}-${rec.d}</td>
+              <td>${goalStats.gd > 0 ? '+' + goalStats.gd : goalStats.gd}</td>
               <td>${r['Group Pts'] || 0}</td>
               <td>${r['Knockout Pts'] || 0}</td>
               <td><strong>${r['Total Pts'] || 0}</strong></td>
