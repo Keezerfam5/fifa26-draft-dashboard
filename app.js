@@ -438,7 +438,12 @@ function openOwnerModal(ownerName) {
     ${advancingTeams.length ? advancingTeams.map(t => `
       <div class="match-card" onclick="openTeamModal('${t.Team}')">
         <strong>${flag(t.Team)} ${t.Team}</strong>
-        <div class="muted">${t['Group Pts'] || 0} group pts • ${t['Total Pts'] || 0} total pts</div>
+       ${(() => {
+  const gs = getTeamGoalStats(t.Team, dashboardData?.games || []);
+  const pd = gs.gd > 0 ? '+' + gs.gd : gs.gd;
+
+  return `<div class="muted">${t['Group Pts'] || 0} group pts • PD ${pd} • ${t['Total Pts'] || 0} total pts</div>`;
+})()}
       </div>
     `).join('') : '<p class="muted">No teams currently projected to advance.</p>'}
 
@@ -446,7 +451,12 @@ function openOwnerModal(ownerName) {
     ${atRiskTeams.length ? atRiskTeams.map(t => `
       <div class="match-card" onclick="openTeamModal('${t.Team}')">
         <strong>${flag(t.Team)} ${t.Team}</strong>
-        <div class="muted">${t['Group Pts'] || 0} group pts • ${t['Total Pts'] || 0} total pts</div>
+        ${(() => {
+  const gs = getTeamGoalStats(t.Team, dashboardData?.games || []);
+  const pd = gs.gd > 0 ? '+' + gs.gd : gs.gd;
+
+  return `<div class="muted">${t['Group Pts'] || 0} group pts • PD ${pd} • ${t['Total Pts'] || 0} total pts</div>`;
+})()}
       </div>
     `).join('') : '<p class="muted">No at-risk teams right now.</p>'}
 
@@ -454,7 +464,12 @@ function openOwnerModal(ownerName) {
     ${teams.map(t => `
       <div class="match-card" onclick="openTeamModal('${t.Team}')">
         <strong>${flag(t.Team)} ${t.Team}</strong>
-        <div class="muted">Group ${t.Group} • ${t['Total Pts'] || 0} pts</div>
+        ${(() => {
+  const gs = getTeamGoalStats(t.Team, dashboardData?.games || []);
+  const pd = gs.gd > 0 ? '+' + gs.gd : gs.gd;
+
+  return `<div class="muted">${t['Group Pts'] || 0} group pts • PD ${pd} • ${t['Total Pts'] || 0} total pts</div>`;
+})()}
       </div>
     `).join('')}
   `;
