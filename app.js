@@ -185,7 +185,7 @@ function renderTicker(games) {
 >
           <div class="ticker-top">
             <span>${isCompleted(g) ? 'FT' : formatShortTime(g.Date)}</span>
-            <span class="ticker-tv">${g.Status || ''}</span>
+            <span class="ticker-tv">${g.Clock || g.Status || ''}</span>
           </div>
 
           <div class="ticker-team">
