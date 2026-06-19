@@ -478,6 +478,8 @@ function openOwnerModal(ownerName) {
   `;
 
   modal.classList.add('open');
+
+  console.log(owner);
 }
 
 function summarizeTeamStats(teamName, games) {
