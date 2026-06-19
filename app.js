@@ -378,6 +378,90 @@ function openTeamModal(teamName) {
   modal.classList.add('open');
 }
 
+function openOwnerModal(ownerName) {
+  const modal = document.getElementById('ownerModal');
+  const body = document.getElementById('ownerModalBody');
+
+  const owner = (dashboardData.leaderboard || []).find(o => o.owner === ownerName);
+  const teams = (dashboardData.teams || [])
+    .filter(t => t.Owner === ownerName)
+    .sort((a, b) => Number(b['Total Pts'] || 0) - Number(a['Total Pts'] || 0));
+
+  const bestTeam = teams[0];
+  const totalTeams = teams.length;
+  const advancingTeams = teams.filter(t => {
+    const groupRows = (dashboardData.teams || []).filter(x => x.Group === t.Group);
+    const games = dashboardData.games || [];
+    const records = buildTeamRecords(games);
+
+    const ranked = groupRows.map(team => {
+      const goalStats = getTeamGoalStats(team.Team, games);
+      return {
+        ...team,
+        groupPts: Number(team['Group Pts'] || 0),
+        gd: goalStats.gd,
+        gf: goalStats.gf
+      };
+    }).sort((a, b) =>
+      b.groupPts - a.groupPts ||
+      b.gd - a.gd ||
+      b.gf - a.gf ||
+      String(a.Team).localeCompare(String(b.Team))
+    );
+
+    return ranked.slice(0, 2).some(x => normalizeTeamName(x.Team) === normalizeTeamName(t.Team));
+  });
+
+  const atRiskTeams = teams.filter(t => !advancingTeams.some(a => normalizeTeamName(a.Team) === normalizeTeamName(t.Team)));
+
+  body.innerHTML = `
+    <h2>${ownerName} Analytics</h2>
+
+    <div class="modal-detail-grid">
+      <div class="modal-detail"><div class="label">Current Points</div><div>${owner?.total || 0}</div></div>
+      <div class="modal-detail"><div class="label">Remaining Possible</div><div>${owner?.remainingPossible || 0}</div></div>
+      <div class="modal-detail"><div class="label">Max Possible</div><div>${owner?.maxPossible || 0}</div></div>
+      <div class="modal-detail"><div class="label">Teams Drafted</div><div>${totalTeams}</div></div>
+      <div class="modal-detail"><div class="label">Projected Advancing</div><div>${advancingTeams.length}</div></div>
+      <div class="modal-detail"><div class="label">At Risk</div><div>${atRiskTeams.length}</div></div>
+    </div>
+
+    <h3>Best Draft Pick</h3>
+    ${bestTeam ? `
+      <div class="match-card" onclick="openTeamModal('${bestTeam.Team}')">
+        <strong>${flag(bestTeam.Team)} ${bestTeam.Team}</strong>
+        <div class="muted">${bestTeam['Total Pts'] || 0} pts • Group ${bestTeam.Group}</div>
+      </div>
+    ` : '<p class="muted">No teams found.</p>'}
+
+    <h3>Projected Advancing Teams</h3>
+    ${advancingTeams.length ? advancingTeams.map(t => `
+      <div class="match-card" onclick="openTeamModal('${t.Team}')">
+        <strong>${flag(t.Team)} ${t.Team}</strong>
+        <div class="muted">${t['Group Pts'] || 0} group pts • ${t['Total Pts'] || 0} total pts</div>
+      </div>
+    `).join('') : '<p class="muted">No teams currently projected to advance.</p>'}
+
+    <h3>At-Risk Teams</h3>
+    ${atRiskTeams.length ? atRiskTeams.map(t => `
+      <div class="match-card" onclick="openTeamModal('${t.Team}')">
+        <strong>${flag(t.Team)} ${t.Team}</strong>
+        <div class="muted">${t['Group Pts'] || 0} group pts • ${t['Total Pts'] || 0} total pts</div>
+      </div>
+    `).join('') : '<p class="muted">No at-risk teams right now.</p>'}
+
+    <h3>All Teams</h3>
+    ${teams.map(t => `
+      <div class="match-card" onclick="openTeamModal('${t.Team}')">
+        <strong>${flag(t.Team)} ${t.Team}</strong>
+        <div class="muted">Group ${t.Group} • ${t['Total Pts'] || 0} pts</div>
+      </div>
+    `).join('')}
+  `;
+
+  modal.classList.add('open');
+}
+
 function summarizeTeamStats(teamName, games) {
   const key = normalizeTeamName(teamName);
   let gf = 0;
@@ -542,7 +626,7 @@ function renderOwnerCards(rows, teams) {
           .sort((a, b) => Number(b['Total Pts'] || 0) - Number(a['Total Pts'] || 0));
 
         return `
-          <div class="owner-card ${ownerClass(r.owner)}">
+<div class="owner-card ${ownerClass(r.owner)}" onclick="openOwnerModal('${r.owner}')">
             <h3>${r.owner}</h3>
             <div class="points">${r.total} pts</div>
             <ul>
@@ -1099,6 +1183,7 @@ document.addEventListener('click', e => {
   if (e.target.classList.contains('match-modal-close')) {
     document.getElementById('matchModal')?.classList.remove('open');
     document.getElementById('teamModal')?.classList.remove('open');
+    document.getElementById('ownerModal')?.classList.remove('open');
   }
 
   if (e.target.id === 'matchModal') {
@@ -1107,6 +1192,10 @@ document.addEventListener('click', e => {
 
   if (e.target.id === 'teamModal') {
     document.getElementById('teamModal')?.classList.remove('open');
+  }
+
+  if (e.target.id === 'ownerModal') {
+    document.getElementById('ownerModal')?.classList.remove('open');
   }
 
 });
