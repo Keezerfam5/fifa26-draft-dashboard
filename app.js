@@ -641,8 +641,8 @@ function renderOwnerCards(rows, teams) {
           .sort((a, b) => Number(b['Total Pts'] || 0) - Number(a['Total Pts'] || 0));
 
         return `
-<div class="owner-card ${ownerClass(r.owner)}" onclick="openOwnerModal('${r.owner}')">
-<div class="owner-card-header">
+<div class="owner-card ${ownerClass(r.owner)}">
+<div class="owner-card-header" onclick="openOwnerModal('${r.owner}')">
   <h3>${r.owner}</h3>
   <span class="analytics-pill">Analytics</span>
 </div>
