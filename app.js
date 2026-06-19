@@ -184,7 +184,7 @@ function renderTicker(games) {
   onclick="openMatchModal(dashboardData.games[${games.indexOf(g)}])"
 >
           <div class="ticker-top">
-            <span>${isCompleted(g) ? 'FT' : formatShortTime(g.Date)}</span>
+<span>${tickerPrimaryStatus(g)}</span>
             <span class="ticker-tv">${g.Clock || g.Status || ''}</span>
           </div>
 
@@ -578,6 +578,23 @@ function formatShortTime(value) {
     minute: '2-digit',
     hour12: true
   }) + ' ET';
+}
+
+function tickerPrimaryStatus(g) {
+  if (isCompleted(g)) return 'FT';
+
+  const status = String(g.Status || '').trim();
+  const clock = String(g.Clock || '').trim();
+
+  const hasStarted =
+    clock ||
+    status.toLowerCase().includes('half') ||
+    status.toLowerCase().includes('progress') ||
+    status.toLowerCase().includes('halftime');
+
+  if (hasStarted) return status || 'Live';
+
+  return formatShortTime(g.Date);
 }
 
 function calculateTitleProbabilities(rows) {
