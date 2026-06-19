@@ -871,8 +871,8 @@ th {
 
 #teams th:nth-child(1),
 #teams td:nth-child(1) {
-  max-width: 135px;
-  white-space: normal;
+  max-width: 95px;
+  width: 95px;
 }
 
 #teams th:nth-child(2),
