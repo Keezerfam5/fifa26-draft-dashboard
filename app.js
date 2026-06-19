@@ -952,10 +952,10 @@ function renderTeams(rows) {
           <th>Team</th>
           <th>Owner</th>
           <th>Group</th>
-          <th>Record</th>
-          <th>PD</th>
-          <th>Group Pts</th>
-          <th>Knockout Pts</th>
+<th>Record<br><span class="subhead">W-L-D</span></th>
+<th>PD<br><span class="subhead">GD</span></th>
+<th>Group<br><span class="subhead">Pts</span></th>
+<th>Knockout<br><span class="subhead">Pts</span></th>
           <th>Total</th>
         </tr>
       </thead>
