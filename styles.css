@@ -928,3 +928,45 @@ th {
   padding-left: 2px;
   padding-right: 2px;
 }
+#teams table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+#teams th:nth-child(1),
+#teams td:nth-child(1) {
+  width: 115px;
+}
+
+#teams th:nth-child(2),
+#teams td:nth-child(2) {
+  width: 48px;
+}
+
+#teams th:nth-child(3),
+#teams td:nth-child(3) {
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  text-align: center;
+}
+
+#teams th:nth-child(4),
+#teams td:nth-child(4) {
+  width: 70px;
+}
+
+#teams th:nth-child(5),
+#teams td:nth-child(5) {
+  width: 50px;
+}
+
+#teams th:nth-child(6),
+#teams td:nth-child(6),
+#teams th:nth-child(7),
+#teams td:nth-child(7),
+#teams th:nth-child(8),
+#teams td:nth-child(8) {
+  width: 55px;
+  text-align: center;
+}
