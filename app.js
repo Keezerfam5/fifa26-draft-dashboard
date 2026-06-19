@@ -383,7 +383,8 @@ function openOwnerModal(ownerName) {
   const body = document.getElementById('ownerModalBody');
 
   const owner = (dashboardData.leaderboard || []).find(o => o.owner === ownerName);
-  console.log(owner);
+  const titleOdds = calculateTitleProbabilities(dashboardData.leaderboard || []);
+const ownerTitlePct = titleOdds[ownerName] || 0;
   const teams = (dashboardData.teams || [])
     .filter(t => t.Owner === ownerName)
     .sort((a, b) => Number(b['Total Pts'] || 0) - Number(a['Total Pts'] || 0));
@@ -424,7 +425,7 @@ function openOwnerModal(ownerName) {
       <div class="modal-detail"><div class="label">Max Possible</div><div>${owner?.maxPossible || 0}</div></div>
 <div class="modal-detail">
   <div class="label">Title %</div>
-  <div>${owner?.titlePct || owner?.titlePercent || 0}%</div>
+  <div>${ownerTitlePct}%</div>
 </div>
       <div class="modal-detail"><div class="label">Projected Advancing</div><div>${advancingTeams.length}</div></div>
       <div class="modal-detail"><div class="label">At Risk</div><div>${atRiskTeams.length}</div></div>
