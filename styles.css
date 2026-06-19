@@ -853,3 +853,69 @@ th {
     padding: 7px;
   }
 }
+#teams table {
+  table-layout: auto;
+}
+
+#teams th,
+#teams td {
+  padding: 6px 5px;
+  font-size: 12px;
+}
+
+#teams .flag {
+  width: 18px;
+  height: 13px;
+  margin-right: 3px;
+}
+
+#teams th:nth-child(1),
+#teams td:nth-child(1) {
+  max-width: 135px;
+  white-space: normal;
+}
+
+#teams th:nth-child(2),
+#teams td:nth-child(2) {
+  max-width: 68px;
+}
+
+#teams th:nth-child(3),
+#teams td:nth-child(3),
+#teams th:nth-child(4),
+#teams td:nth-child(4),
+#teams th:nth-child(5),
+#teams td:nth-child(5),
+#teams th:nth-child(6),
+#teams td:nth-child(6),
+#teams th:nth-child(7),
+#teams td:nth-child(7),
+#teams th:nth-child(8),
+#teams td:nth-child(8) {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.subhead {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  #teams table {
+    min-width: 620px;
+  }
+
+  #teams th,
+  #teams td {
+    padding: 5px 4px;
+    font-size: 11px;
+  }
+
+  #teams th:nth-child(1),
+  #teams td:nth-child(1) {
+    max-width: 120px;
+  }
+}
