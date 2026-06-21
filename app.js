@@ -598,28 +598,59 @@ function tickerPrimaryStatus(g) {
 }
 
 function calculateTitleProbabilities(rows) {
-  const totals = rows.map(r => ({
-    owner: r.owner,
-    current: Number(r.total || 0),
-    max: Number(r.maxPossible || 0)
-  }));
+  const teams = dashboardData?.teams || [];
+  const games = dashboardData?.games || [];
+  const records = buildTeamRecords(games);
 
-  const minMax = Math.min(...totals.map(r => r.max));
-  const weights = totals.map(r => {
-    const currentBonus = r.current * 0.35;
-    const ceilingBonus = Math.max(0, r.max - minMax + 1);
+  const ownerScores = rows.map(ownerRow => {
+    const ownerTeams = teams.filter(t => t.Owner === ownerRow.owner);
+
+    let projectedValue = Number(ownerRow.total || 0);
+
+    ownerTeams.forEach(t => {
+      const groupRows = teams.filter(x => x.Group === t.Group);
+      const advPct = calculateAdvancementProjection(t, groupRows, games, records) / 100;
+
+      const currentPts = Number(t['Total Pts'] || 0);
+      const remainingPossible = estimateTeamRemainingValue(t, games, advPct);
+
+      projectedValue += currentPts * 0.15;
+      projectedValue += remainingPossible;
+    });
+
     return {
-      owner: r.owner,
-      weight: Math.max(1, currentBonus + ceilingBonus)
+      owner: ownerRow.owner,
+      score: Math.max(1, projectedValue)
     };
   });
 
-  const totalWeight = weights.reduce((sum, r) => sum + r.weight, 0);
+  const totalScore = ownerScores.reduce((sum, r) => sum + r.score, 0);
 
-  return weights.reduce((acc, r) => {
-    acc[r.owner] = totalWeight ? Math.round((r.weight / totalWeight) * 100) : 0;
+  return ownerScores.reduce((acc, r) => {
+    acc[r.owner] = totalScore ? Math.round((r.score / totalScore) * 100) : 0;
     return acc;
   }, {});
+}
+
+function estimateTeamRemainingValue(team, games, advPct) {
+  const teamKey = normalizeTeamName(team.Team);
+
+  const completedGroupGames = games.filter(g =>
+    isCompleted(g) &&
+    String(g.Stage || '').toLowerCase() === 'group' &&
+    (
+      normalizeTeamName(g['Team 1']) === teamKey ||
+      normalizeTeamName(g['Team 2']) === teamKey
+    )
+  ).length;
+
+  const remainingGroupGames = Math.max(0, 3 - completedGroupGames);
+  const expectedGroupPts = remainingGroupGames * 1.35;
+
+  const knockoutPts = Number(team['Knockout Pts'] || 0);
+  const maxKnockoutRemaining = Math.max(0, 60 - knockoutPts);
+
+  return expectedGroupPts + (maxKnockoutRemaining * advPct);
 }
 
 function renderLeaderboard(rows) {
