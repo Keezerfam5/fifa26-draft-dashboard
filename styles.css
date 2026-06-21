@@ -904,9 +904,45 @@ th {
 }
 
 @media (max-width: 900px) {
+
   #teams table {
     min-width: 620px;
   }
+
+  .hero-trophy {
+    width: 42px;
+    height: 42px;
+  }
+
+  .hero h1 {
+    font-size: 1.5rem;
+    line-height: 1.1;
+  }
+
+  .hero-subtitle {
+    font-size: 11px;
+  }
+
+}
+
+.hero-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.hero-trophy {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.hero-subtitle {
+  margin-top: 4px;
+  font-size: 13px;
+  opacity: 0.85;
+}
 
   #teams th,
   #teams td {
@@ -1002,4 +1038,22 @@ th {
 
 .owner-card-header {
   cursor: pointer;
+}
+.hero-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.hero-trophy {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.hero-subtitle {
+  margin-top: 4px;
+  font-size: 13px;
+  opacity: 0.85;
 }
