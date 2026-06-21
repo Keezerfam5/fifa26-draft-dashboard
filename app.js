@@ -976,31 +976,139 @@ function getLoser(g) {
 
 function calculateAdvancementProjection(team, groupTeams, games, records) {
   const teamName = team.Team;
+  const teamKey = normalizeTeamName(teamName);
+
   const currentPts = Number(team['Group Pts'] || 0);
-const rec = records[normalizeTeamName(teamName)] || { w: 0, l: 0, d: 0 };
+  const goalStats = getTeamGoalStats(teamName, games);
+  const rec = records[teamKey] || { w: 0, l: 0, d: 0 };
 
   const played = rec.w + rec.l + rec.d;
   const remaining = Math.max(0, 3 - played);
 
-  let projectedPts = currentPts + remaining * 1.5;
+  const groupRankings = rankGroupTeams(groupTeams, games, records);
+  const currentRank = groupRankings.findIndex(t => normalizeTeamName(t.Team) === teamKey) + 1;
 
-  const groupMax = groupTeams.map(t => {
-    const r = records[normalizeTeamName(t.Team)] || { w: 0, l: 0, d: 0 };
-    const p = r.w + r.l + r.d;
-    const rem = Math.max(0, 3 - p);
-    return Number(t['Group Pts'] || 0) + rem * 1.5;
-  });
+  const strengthAdjustment = remainingScheduleAdjustment(teamName, groupTeams, games);
+  const headToHeadAdjustment = headToHeadAdjustmentForTeam(teamName, groupTeams, games);
 
-  const sorted = [...groupMax].sort((a, b) => b - a);
-  const secondPlaceTarget = sorted[1] || 0;
+  let percentage = 50;
 
-  let percentage = 50 + ((projectedPts - secondPlaceTarget) * 18);
+  percentage += currentPts * 12;
+  percentage += goalStats.gd * 5;
+  percentage += goalStats.gf * 2;
+  percentage += strengthAdjustment;
+  percentage += headToHeadAdjustment;
 
-  if (currentPts > secondPlaceTarget) percentage += 10;
-  if (remaining === 0 && projectedPts >= secondPlaceTarget) percentage = 95;
-  if (remaining === 0 && projectedPts < secondPlaceTarget) percentage = 5;
+  if (currentRank === 1) percentage += 18;
+  if (currentRank === 2) percentage += 8;
+  if (currentRank === 3) percentage -= 8;
+  if (currentRank === 4) percentage -= 18;
+
+  if (remaining === 0) {
+    percentage = currentRank <= 2 ? 97 : 3;
+  }
 
   return Math.max(1, Math.min(99, Math.round(percentage)));
+}
+
+function rankGroupTeams(groupTeams, games, records) {
+  return groupTeams.map(t => {
+    const goalStats = getTeamGoalStats(t.Team, games);
+    const rec = records[normalizeTeamName(t.Team)] || { w: 0, l: 0, d: 0 };
+
+    return {
+      ...t,
+      groupPts: Number(t['Group Pts'] || 0),
+      gd: goalStats.gd,
+      gf: goalStats.gf,
+      played: rec.w + rec.l + rec.d
+    };
+  }).sort((a, b) =>
+    b.groupPts - a.groupPts ||
+    b.gd - a.gd ||
+    b.gf - a.gf ||
+    String(a.Team).localeCompare(String(b.Team))
+  );
+}
+
+function remainingScheduleAdjustment(teamName, groupTeams, games) {
+  const teamKey = normalizeTeamName(teamName);
+
+  const remainingGames = games.filter(g => {
+    if (isCompleted(g)) return false;
+    if (String(g.Stage || '').toLowerCase() !== 'group') return false;
+
+    return (
+      normalizeTeamName(g['Team 1']) === teamKey ||
+      normalizeTeamName(g['Team 2']) === teamKey
+    );
+  });
+
+  if (!remainingGames.length) return 0;
+
+  let adjustment = 0;
+
+  remainingGames.forEach(g => {
+    const opponent =
+      normalizeTeamName(g['Team 1']) === teamKey ? g['Team 2'] : g['Team 1'];
+
+    const opponentRow = groupTeams.find(t =>
+      normalizeTeamName(t.Team) === normalizeTeamName(opponent)
+    );
+
+    if (!opponentRow) return;
+
+    const oppPts = Number(opponentRow['Group Pts'] || 0);
+    const oppStats = getTeamGoalStats(opponentRow.Team, games);
+
+    const opponentStrength = oppPts + (oppStats.gd * 0.5);
+
+    if (opponentStrength >= 6) adjustment -= 6;
+    else if (opponentStrength >= 4) adjustment -= 3;
+    else if (opponentStrength <= 1) adjustment += 4;
+  });
+
+  return adjustment;
+}
+
+function headToHeadAdjustmentForTeam(teamName, groupTeams, games) {
+  const teamKey = normalizeTeamName(teamName);
+  let adjustment = 0;
+
+  groupTeams.forEach(other => {
+    const otherKey = normalizeTeamName(other.Team);
+    if (otherKey === teamKey) return;
+
+    const h2h = games.find(g => {
+      if (!isCompleted(g)) return false;
+      if (String(g.Stage || '').toLowerCase() !== 'group') return false;
+
+      const t1 = normalizeTeamName(g['Team 1']);
+      const t2 = normalizeTeamName(g['Team 2']);
+
+      return (
+        (t1 === teamKey && t2 === otherKey) ||
+        (t1 === otherKey && t2 === teamKey)
+      );
+    });
+
+    if (!h2h) return;
+
+    const s1 = Number(h2h['Score 1']);
+    const s2 = Number(h2h['Score 2']);
+
+    if (isNaN(s1) || isNaN(s2)) return;
+
+    const teamWasT1 = normalizeTeamName(h2h['Team 1']) === teamKey;
+
+    if (s1 === s2) return;
+
+    const teamWon = teamWasT1 ? s1 > s2 : s2 > s1;
+
+    adjustment += teamWon ? 4 : -4;
+  });
+
+  return adjustment;
 }
 
 function renderMatchCenter(rows) {
