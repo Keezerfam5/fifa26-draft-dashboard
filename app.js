@@ -464,6 +464,38 @@ const ownerTitlePct = owner?.titlePct || 0;
       </div>
     `).join('') : '<p class="muted">No at-risk teams right now.</p>'}
 
+<h3>Simulation Breakdown</h3>
+<div class="sim-table-wrap">
+  <table class="sim-table">
+    <thead>
+      <tr>
+        <th>Team</th>
+        <th>Adv</th>
+        <th>R16</th>
+        <th>QF</th>
+        <th>SF</th>
+        <th>Final</th>
+        <th>Win</th>
+        <th>Proj</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${teams.map(t => `
+        <tr>
+          <td>${flag(t.Team)} ${t.Team}</td>
+          <td>${t.SimAdv || 0}%</td>
+          <td>${t.SimR16 || 0}%</td>
+          <td>${t.SimQF || 0}%</td>
+          <td>${t.SimSF || 0}%</td>
+          <td>${t.SimFinal || 0}%</td>
+          <td>${t.SimWinner || 0}%</td>
+          <td><strong>${t.SimExpectedPts || t['Total Pts'] || 0}</strong></td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>
+</div>
+
     <h3>All Teams</h3>
     ${teams.map(t => `
       <div class="match-card" onclick="openTeamModal('${t.Team}')">
