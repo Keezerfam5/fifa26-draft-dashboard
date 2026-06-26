@@ -602,10 +602,35 @@ function calculateTitleProbabilities(rows) {
   const games = dashboardData?.games || [];
   const records = buildTeamRecords(games);
 
-  const SIMS = 5000;
+  const SIMS = 1000;
   const wins = {};
 
   rows.forEach(r => wins[r.owner] = 0);
+
+  const teamInputs = teams
+    .filter(team => team.Owner)
+    .map(team => {
+      const groupTeams = teams.filter(t => t.Group === team.Group);
+      const advPct = calculateAdvancementProjection(team, groupTeams, games, records) / 100;
+      const strength = teamStrengthScore(team, games);
+
+      const teamKey = normalizeTeamName(team.Team);
+      const completedGroupGames = games.filter(g =>
+        isCompleted(g) &&
+        String(g.Stage || '').toLowerCase() === 'group' &&
+        (
+          normalizeTeamName(g['Team 1']) === teamKey ||
+          normalizeTeamName(g['Team 2']) === teamKey
+        )
+      ).length;
+
+      return {
+        owner: team.Owner,
+        advPct,
+        strength,
+        remainingGroupGames: Math.max(0, 3 - completedGroupGames)
+      };
+    });
 
   for (let i = 0; i < SIMS; i++) {
     const ownerTotals = {};
@@ -614,20 +639,15 @@ function calculateTitleProbabilities(rows) {
       ownerTotals[r.owner] = Number(r.total || 0);
     });
 
-    teams.forEach(team => {
-      if (!team.Owner) return;
+    teamInputs.forEach(team => {
+      ownerTotals[team.owner] += simulateRemainingGroupPointsFast(
+        team.remainingGroupGames,
+        team.strength
+      );
 
-      const groupTeams = teams.filter(t => t.Group === team.Group);
-      const advPct = calculateAdvancementProjection(team, groupTeams, games, records) / 100;
-      const strength = teamStrengthScore(team, games);
-
-      const advances = Math.random() < advPct;
-
-      if (advances) {
-        ownerTotals[team.Owner] += simulateKnockoutPoints(team, strength);
+      if (Math.random() < team.advPct) {
+        ownerTotals[team.owner] += simulateKnockoutPoints(team, team.strength);
       }
-
-      ownerTotals[team.Owner] += simulateRemainingGroupPoints(team, games, strength);
     });
 
     const winner = Object.entries(ownerTotals)
@@ -640,6 +660,21 @@ function calculateTitleProbabilities(rows) {
     acc[r.owner] = Math.round((wins[r.owner] / SIMS) * 100);
     return acc;
   }, {});
+}
+
+function simulateRemainingGroupPointsFast(remaining, strength) {
+  let points = 0;
+
+  for (let i = 0; i < remaining; i++) {
+    const roll = Math.random();
+    const winChance = Math.min(0.7, Math.max(0.2, 0.38 + strength * 0.04));
+    const drawChance = 0.25;
+
+    if (roll < winChance) points += 3;
+    else if (roll < winChance + drawChance) points += 1;
+  }
+
+  return points;
 }
 
 function simulateRemainingGroupPoints(team, games, strength) {
