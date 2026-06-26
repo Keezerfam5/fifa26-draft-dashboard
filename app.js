@@ -602,34 +602,137 @@ function calculateTitleProbabilities(rows) {
   const games = dashboardData?.games || [];
   const records = buildTeamRecords(games);
 
-  const ownerScores = rows.map(ownerRow => {
-    const ownerTeams = teams.filter(t => t.Owner === ownerRow.owner);
+  const SIMS = 5000;
+  const wins = {};
 
-    let projectedValue = Number(ownerRow.total || 0);
+  rows.forEach(r => wins[r.owner] = 0);
 
-    ownerTeams.forEach(t => {
-      const groupRows = teams.filter(x => x.Group === t.Group);
-      const advPct = calculateAdvancementProjection(t, groupRows, games, records) / 100;
+  for (let i = 0; i < SIMS; i++) {
+    const ownerTotals = {};
 
-      const currentPts = Number(t['Total Pts'] || 0);
-      const remainingPossible = estimateTeamRemainingValue(t, games, advPct);
-
-      projectedValue += currentPts * 0.15;
-      projectedValue += remainingPossible;
+    rows.forEach(r => {
+      ownerTotals[r.owner] = Number(r.total || 0);
     });
 
-    return {
-      owner: ownerRow.owner,
-      score: Math.max(1, projectedValue)
-    };
-  });
+    teams.forEach(team => {
+      if (!team.Owner) return;
 
-  const totalScore = ownerScores.reduce((sum, r) => sum + r.score, 0);
+      const groupTeams = teams.filter(t => t.Group === team.Group);
+      const advPct = calculateAdvancementProjection(team, groupTeams, games, records) / 100;
+      const strength = teamStrengthScore(team, games);
 
-  return ownerScores.reduce((acc, r) => {
-    acc[r.owner] = totalScore ? Math.round((r.score / totalScore) * 100) : 0;
+      const advances = Math.random() < advPct;
+
+      if (advances) {
+        ownerTotals[team.Owner] += simulateKnockoutPoints(team, strength);
+      }
+
+      ownerTotals[team.Owner] += simulateRemainingGroupPoints(team, games, strength);
+    });
+
+    const winner = Object.entries(ownerTotals)
+      .sort((a, b) => b[1] - a[1])[0][0];
+
+    wins[winner]++;
+  }
+
+  return rows.reduce((acc, r) => {
+    acc[r.owner] = Math.round((wins[r.owner] / SIMS) * 100);
     return acc;
   }, {});
+}
+
+function simulateRemainingGroupPoints(team, games, strength) {
+  const teamKey = normalizeTeamName(team.Team);
+
+  const completedGroupGames = games.filter(g =>
+    isCompleted(g) &&
+    String(g.Stage || '').toLowerCase() === 'group' &&
+    (
+      normalizeTeamName(g['Team 1']) === teamKey ||
+      normalizeTeamName(g['Team 2']) === teamKey
+    )
+  ).length;
+
+  const remaining = Math.max(0, 3 - completedGroupGames);
+
+  let points = 0;
+
+  for (let i = 0; i < remaining; i++) {
+    const roll = Math.random();
+
+    const winChance = Math.min(0.7, Math.max(0.2, 0.38 + strength * 0.04));
+    const drawChance = 0.25;
+
+    if (roll < winChance) points += 3;
+    else if (roll < winChance + drawChance) points += 1;
+  }
+
+  return points;
+}
+
+function simulateKnockoutPoints(team, strength) {
+  let points = 0;
+
+  const r16Chance = Math.min(0.9, Math.max(0.25, 0.45 + strength * 0.05));
+  const qfChance = Math.min(0.8, Math.max(0.15, 0.32 + strength * 0.045));
+  const sfChance = Math.min(0.7, Math.max(0.08, 0.22 + strength * 0.04));
+  const finalChance = Math.min(0.55, Math.max(0.04, 0.14 + strength * 0.035));
+  const winChance = Math.min(0.4, Math.max(0.02, 0.08 + strength * 0.03));
+
+  if (Math.random() < r16Chance) points += 5;
+  if (Math.random() < qfChance) points += 10;
+  if (Math.random() < sfChance) points += 15;
+
+  if (Math.random() < finalChance) {
+    if (Math.random() < winChance) points += 30;
+    else points += 20;
+  }
+
+  return points;
+}
+
+function teamStrengthScore(team, games) {
+  const stats = getTeamGoalStats(team.Team, games);
+  const groupPts = Number(team['Group Pts'] || 0);
+  const totalPts = Number(team['Total Pts'] || 0);
+
+  return (
+    groupPts * 0.8 +
+    stats.gd * 0.7 +
+    stats.gf * 0.3 +
+    totalPts * 0.15 +
+    baselineTeamStrength(team.Team)
+  );
+}
+
+function baselineTeamStrength(teamName) {
+  const strengths = {
+    France: 6,
+    Brazil: 6,
+    Argentina: 6,
+    England: 5.5,
+    Spain: 5.5,
+    Portugal: 5.5,
+    Germany: 5.5,
+    Netherlands: 5,
+    Belgium: 4.5,
+    Uruguay: 4.5,
+    Colombia: 4,
+    Croatia: 4,
+    Mexico: 3.5,
+    United States: 3.5,
+    Morocco: 3.5,
+    Switzerland: 3.5,
+    Japan: 3.5,
+    Austria: 3,
+    Sweden: 3,
+    Ecuador: 3,
+    Senegal: 3,
+    Norway: 3
+  };
+
+  return strengths[teamName] || 1.5;
 }
 
 function estimateTeamRemainingValue(team, games, advPct) {
