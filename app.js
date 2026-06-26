@@ -839,17 +839,25 @@ function renderOwnerCards(rows, teams) {
     <span class="analytics-pill">Analytics</span>
   </div>
 </div>
-            <div class="points">${r.total} pts</div>
-            <ul>
-              ${ownerTeams.map(t => `
-                <li>
-                  <span class="team-link" onclick="openTeamModal('${t.Team}')">
-  ${flag(t.Team)} ${t.Team}
-</span>
-                  <strong>${t['Total Pts'] || 0}</strong>
-                </li>
-              `).join('')}
-            </ul>
+    <div class="points">${r.total} pts</div>
+
+<div class="owner-team-header">
+  <span>Team</span>
+  <span>Cur</span>
+  <span>Proj</span>
+</div>
+
+<ul>
+  ${ownerTeams.map(t => `
+    <li class="owner-team-row">
+      <span class="team-link" onclick="openTeamModal('${t.Team}')">
+        ${flag(t.Team)} ${t.Team}
+      </span>
+      <strong>${t['Total Pts'] || 0}</strong>
+      <strong>${t.SimExpectedPts || t['Total Pts'] || 0}</strong>
+    </li>
+  `).join('')}
+</ul>       
           </div>
         `;
       }).join('')}
