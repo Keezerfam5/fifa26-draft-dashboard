@@ -1070,3 +1070,23 @@ th {
   font-size: 12px;
   font-weight: 900;
 }
+.owner-team-header,
+.owner-team-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 42px 48px;
+  gap: 8px;
+  align-items: center;
+}
+
+.owner-team-header {
+  margin-top: 10px;
+  padding-bottom: 4px;
+  font-size: 11px;
+  font-weight: 900;
+  color: #6b7280;
+  text-transform: uppercase;
+}
+
+.owner-team-row strong {
+  text-align: right;
+}
