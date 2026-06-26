@@ -383,8 +383,7 @@ function openOwnerModal(ownerName) {
   const body = document.getElementById('ownerModalBody');
 
   const owner = (dashboardData.leaderboard || []).find(o => o.owner === ownerName);
-  const titleOdds = calculateTitleProbabilities(dashboardData.leaderboard || []);
-const ownerTitlePct = titleOdds[ownerName] || 0;
+const ownerTitlePct = owner?.titlePct || 0;
   const teams = (dashboardData.teams || [])
     .filter(t => t.Owner === ownerName)
     .sort((a, b) => Number(b['Total Pts'] || 0) - Number(a['Total Pts'] || 0));
@@ -793,7 +792,7 @@ function estimateTeamRemainingValue(team, games, advPct) {
 
 function renderLeaderboard(rows) {
   const medals = ['🥇', '🥈', '🥉'];
-  const titleOdds = calculateTitleProbabilities(rows);
+const titleOdds = {};
 
   document.getElementById('leaderboard').innerHTML = `
     <table>
@@ -815,7 +814,7 @@ function renderLeaderboard(rows) {
             <td><strong>${r.total || 0}</strong></td>
             <td>${r.remainingPossible || 0}</td>
             <td><strong>${r.maxPossible || 0}</strong></td>
-            <td><strong>${titleOdds[r.owner] || 0}%</strong></td>
+<td><strong>${r.titlePct || 0}%</strong></td>
           </tr>
         `).join('')}
       </tbody>
