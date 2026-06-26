@@ -834,7 +834,10 @@ function renderOwnerCards(rows, teams) {
 <div class="owner-card ${ownerClass(r.owner)}">
 <div class="owner-card-header" onclick="openOwnerModal('${r.owner}')">
   <h3>${r.owner}</h3>
-  <span class="analytics-pill">Analytics</span>
+  <div class="owner-header-actions">
+    <span class="owner-title-pct">${r.titlePct || 0}%</span>
+    <span class="analytics-pill">Analytics</span>
+  </div>
 </div>
             <div class="points">${r.total} pts</div>
             <ul>
