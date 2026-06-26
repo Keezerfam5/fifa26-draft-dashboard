@@ -721,7 +721,7 @@ function baselineTeamStrength(teamName) {
     Colombia: 4,
     Croatia: 4,
     Mexico: 3.5,
-    United States: 3.5,
+    'United States': 3.5,
     Morocco: 3.5,
     Switzerland: 3.5,
     Japan: 3.5,
