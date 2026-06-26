@@ -1090,3 +1090,26 @@ th {
 .owner-team-row strong {
   text-align: right;
 }
+.sim-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.sim-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.sim-table th,
+.sim-table td {
+  padding: 7px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.sim-table th {
+  background: #f9fafb;
+  font-size: 11px;
+  text-transform: uppercase;
+}
