@@ -1073,9 +1073,36 @@ th {
 .owner-team-header,
 .owner-team-row {
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) 42px 48px;
-  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) 44px 58px;
+  gap: 6px;
   align-items: center;
+  width: 100%;
+}
+
+.owner-team-header span,
+.owner-team-row span,
+.owner-team-row strong {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.owner-team-row span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.owner-team-header span:nth-child(2),
+.owner-team-header span:nth-child(3),
+.owner-team-row strong {
+  text-align: right;
+}
+
+.owner-card ul {
+  width: 100%;
+}
+
+.owner-card li.owner-team-row {
+  justify-content: unset !important;
 }
 
 .owner-team-header {
