@@ -1179,10 +1179,10 @@ function resolveBracketTeam(name, context) {
   const raw = String(name || '').trim();
   const lower = raw.toLowerCase();
 
-  const knockoutMatch = lower.match(/round of 32 (\d+) winner/);
-  if (knockoutMatch) {
-    return context.r32Winners?.[Number(knockoutMatch[1]) - 1] || raw;
-  }
+const knockoutMatch = lower.match(/round of 32 (\d+) winner/);
+if (knockoutMatch) {
+  return raw;
+}
 
   const r16Match = lower.match(/round of 16 (\d+) winner/);
   if (r16Match) {
