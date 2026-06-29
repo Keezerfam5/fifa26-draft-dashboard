@@ -1092,10 +1092,19 @@ function teamLabel(team, context = {}) {
 }
 
 function teamLabelWithOwner(team, context = {}, stage = '') {
-  const resolved = resolveBracketTeam(team, context);
-if (!isValidKnockoutDisplayTeam(resolved, stage, context)) {
-  return `<span class="placeholder-team">${team}</span>`;
-}
+  const raw = String(team || '').trim();
+  const rawLower = raw.toLowerCase();
+
+  const rawIsPlaceholder =
+    rawLower.includes('winner') ||
+    rawLower.includes('loser') ||
+    rawLower.includes('runner') ||
+    rawLower.includes('round') ||
+    rawLower.includes('tbd');
+
+  const resolved = rawIsPlaceholder
+    ? resolveBracketTeam(raw, context)
+    : raw;
 
   if (!resolved) return '';
 
