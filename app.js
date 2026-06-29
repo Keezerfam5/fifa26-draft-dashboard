@@ -1093,7 +1093,7 @@ function teamLabel(team, context = {}) {
 
 function teamLabelWithOwner(team, context = {}, stage = '') {
   const resolved = resolveBracketTeam(team, context);
-  if (!isValidKnockoutDisplayTeam(resolved, stage, context)) {
+if (!isValidKnockoutDisplayTeam(resolved, stage, context)) {
   return `<span class="placeholder-team">${team}</span>`;
 }
 
@@ -1134,15 +1134,13 @@ function isValidKnockoutDisplayTeam(team, stage, context = {}) {
   const lowerStage = String(stage || '').toLowerCase();
   const key = normalizeTeamName(team);
 
-  if (!key) return true;
-
   const isPlaceholder =
     key.includes('winner') ||
     key.includes('loser') ||
     key.includes('round') ||
     key.includes('tbd');
 
-  if (isPlaceholder) return true;
+  if (!key || isPlaceholder) return true;
   if (lowerStage === 'round of 32') return true;
 
   if (lowerStage === 'round of 16') {
