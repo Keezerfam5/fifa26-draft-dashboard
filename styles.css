@@ -1140,3 +1140,28 @@ th {
   font-size: 11px;
   text-transform: uppercase;
 }
+.owner-card li.owner-team-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 38px 54px !important;
+  gap: 6px !important;
+  justify-content: normal !important;
+  align-items: center !important;
+}
+
+.owner-team-row span:first-child {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.owner-team-row strong {
+  text-align: right !important;
+  white-space: nowrap !important;
+}
+
+.owner-team-header {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 38px 54px !important;
+  gap: 6px !important;
+}
