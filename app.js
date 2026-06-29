@@ -1022,10 +1022,10 @@ ${third.length ? third.map(g => bracketGame(g, context)).join('') : '<div class=
         </div>
 
         <div class="bracket-wing right-wing">
-          ${bracketColumn('Semifinal', sf.slice(1, 2))}
-          ${bracketColumn('Quarterfinals', qf.slice(2, 4))}
-          ${bracketColumn('Round of 16', r16.slice(4, 8))}
-          ${bracketColumn('Round of 32', r32.slice(8, 16))}
+${bracketColumn('Semifinal', sf.slice(1, 2), context)}
+${bracketColumn('Quarterfinals', qf.slice(2, 4), context)}
+${bracketColumn('Round of 16', r16.slice(4, 8), context)}
+${bracketColumn('Round of 32', r32.slice(8, 16), context)}
         </div>
 
       </div>
@@ -1050,11 +1050,11 @@ function bracketGame(g, context = {}) {
     <div class="bracket-game">
       <div class="bracket-date">${formatDate(g.Date)}</div>
       <div class="bracket-team">
-<span>${teamLabelWithOwner(g['Team 1'], context)}</span>
+        <span>${teamLabelWithOwner(g['Team 1'], context, g.Stage)}</span>
         <strong>${safe(g['Score 1'])}</strong>
       </div>
       <div class="bracket-team">
-        <span>${teamLabelWithOwner(g['Team 2'], context)}</span>
+        <span>${teamLabelWithOwner(g['Team 2'], context, g.Stage)}</span>
         <strong>${safe(g['Score 2'])}</strong>
       </div>
       <div class="bracket-status">${g.Status || ''}</div>
@@ -1091,8 +1091,11 @@ function teamLabel(team, context = {}) {
   return `${flag(resolved)} ${resolved}`;
 }
 
-function teamLabelWithOwner(team, context = {}) {
+function teamLabelWithOwner(team, context = {}, stage = '') {
   const resolved = resolveBracketTeam(team, context);
+  if (!isValidKnockoutDisplayTeam(resolved, stage, context)) {
+  return `<span class="placeholder-team">${team}</span>`;
+}
 
   if (!resolved) return '';
 
@@ -1125,6 +1128,44 @@ const ownerCss = ownerClass(owner);
 </div>
     </div>
   `;
+}
+
+function isValidKnockoutDisplayTeam(team, stage, context = {}) {
+  const lowerStage = String(stage || '').toLowerCase();
+  const key = normalizeTeamName(team);
+
+  if (!key) return true;
+
+  const isPlaceholder =
+    key.includes('winner') ||
+    key.includes('loser') ||
+    key.includes('round') ||
+    key.includes('tbd');
+
+  if (isPlaceholder) return true;
+  if (lowerStage === 'round of 32') return true;
+
+  if (lowerStage === 'round of 16') {
+    return (context.r32Winners || []).some(t => normalizeTeamName(t) === key);
+  }
+
+  if (lowerStage === 'quarterfinal') {
+    return (context.r16Winners || []).some(t => normalizeTeamName(t) === key);
+  }
+
+  if (lowerStage === 'semifinal') {
+    return (context.qfWinners || []).some(t => normalizeTeamName(t) === key);
+  }
+
+  if (lowerStage === 'final') {
+    return (context.sfWinners || []).some(t => normalizeTeamName(t) === key);
+  }
+
+  if (lowerStage === 'third place') {
+    return (context.sfLosers || []).some(t => normalizeTeamName(t) === key);
+  }
+
+  return true;
 }
 
 function resolveBracketTeam(name, context) {
