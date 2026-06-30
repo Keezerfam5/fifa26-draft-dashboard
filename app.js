@@ -1353,14 +1353,19 @@ function getWinner(g) {
   if (s1 > s2) return t1;
   if (s2 > s1) return t2;
 
-  // Penalty shootout known results
-  if (status.includes('penalties')) {
-    const key = [normalizeTeamName(t1), normalizeTeamName(t2)].sort().join('|');
+  const key = [normalizeTeamName(t1), normalizeTeamName(t2)].sort().join('|');
 
-    const penaltyWinners = {
-      'germany|paraguay': 'Paraguay'
-    };
+  const penaltyWinners = {
+    'germany|paraguay': 'Paraguay',
+    'morocco|netherlands': 'Morocco'
+  };
 
+  if (
+    status.includes('pen') ||
+    status.includes('penalties') ||
+    status.includes('shootout') ||
+    penaltyWinners[key]
+  ) {
     return penaltyWinners[key] || '';
   }
 
