@@ -937,15 +937,16 @@ function renderOwnerCards(rows, teams) {
 
 function likelyRound(t) {
   const current = Number(t['Total Pts'] || 0);
+  const ko = Number(t['Knockout Pts'] || 0);
   const projected = Number(t.SimExpectedPts || current);
 
-  const r16 = Number(t.SimR16 || 0);
-  const qf = Number(t.SimQF || 0);
-  const sf = Number(t.SimSF || 0);
+  const r16 = Math.max(Number(t.SimR16 || 0), ko >= 5 ? 100 : 0);
+  const qf = Math.max(Number(t.SimQF || 0), ko >= 10 ? 100 : 0);
+  const sf = Math.max(Number(t.SimSF || 0), ko >= 15 ? 100 : 0);
   const final = Number(t.SimFinal || 0);
   const winner = Number(t.SimWinner || 0);
 
-  if (projected <= current && qf === 0 && sf === 0 && final === 0 && winner === 0) {
+  if (projected <= current && ko === 0 && r16 === 0 && qf === 0 && sf === 0 && final === 0 && winner === 0) {
     return `<span class="round-badge out">OUT</span>`;
   }
 
