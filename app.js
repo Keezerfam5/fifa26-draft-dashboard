@@ -199,7 +199,7 @@ function renderTicker(games) {
           </div>
 
 <div class="ticker-location">
-  ${g.Location || g.Venue || ''}
+${venueWithCity(g)}
 </div>
 
 <div class="ticker-odds">
@@ -232,6 +232,31 @@ function formatOdds(g) {
   if (!odds && !overUnder) return 'Odds unavailable';
 
   return `${odds || ''}${odds && overUnder ? ' | ' : ''}${overUnder ? 'O/U ' + overUnder : ''}`;
+}
+
+function venueWithCity(g) {
+  const venue = g.Location || g.Venue || '';
+  if (!venue) return '';
+
+  const cityMap = {
+    'Estadio Banorte': 'Mexico City',
+    'Mercedes-Benz Stadium': 'Atlanta',
+    'SoFi Stadium': 'Los Angeles',
+    'BC Place': 'Vancouver',
+    'Estadio Akron': 'Guadalajara',
+    'Lumen Field': 'Seattle',
+    'Gillette Stadium': 'Foxborough',
+    'Lincoln Financial Field': 'Philadelphia',
+    "Levi's Stadium": 'Santa Clara',
+    'NRG Stadium': 'Houston',
+    'BMO Field': 'Toronto',
+    'GEHA Field at Arrowhead Stadium': 'Kansas City',
+    'Estadio BBVA': 'Monterrey',
+    'Hard Rock Stadium': 'Miami',
+    'AT&T Stadium': 'Dallas'
+  };
+
+  return cityMap[venue] ? `${venue} - ${cityMap[venue]}` : venue;
 }
 
 function openMatchModal(game) {
@@ -625,7 +650,7 @@ function tickerPrimaryStatus(g) {
 
   if (hasStarted) return status || 'Live';
 
-  return formatShortTime(g.Date);
+  return `${status || 'Scheduled'} • ${formatShortTime(g.Date)}`;
 }
 
 function tickerWinnerText(g) {
