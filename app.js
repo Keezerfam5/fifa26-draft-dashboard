@@ -924,6 +924,7 @@ function renderOwnerCards(rows, teams) {
       </span>
       <strong>${t['Total Pts'] || 0}</strong>
       <strong>${Math.round(Number(t.SimExpectedPts || t['Total Pts'] || 0))}</strong>
+<strong>${Math.round(Number(t.SimExpectedPts || t['Total Pts'] || 0))}</strong>
 <strong>${likelyRound(t)}</strong>
     </li>
   `).join('')}
@@ -936,25 +937,39 @@ function renderOwnerCards(rows, teams) {
 }
 
 function likelyRound(t) {
+
   const current = Number(t['Total Pts'] || 0);
 
   const r16 = Number(t.SimR16 || 0);
   const qf = Number(t.SimQF || 0);
   const sf = Number(t.SimSF || 0);
   const final = Number(t.SimFinal || 0);
-  const win = Number(t.SimWinner || 0);
+  const winner = Number(t.SimWinner || 0);
 
-  if (current === 0 && r16 === 0 && qf === 0 && sf === 0 && final === 0 && win === 0) {
-    return 'ELIM';
+  if (
+    current === 0 &&
+    r16 === 0 &&
+    qf === 0 &&
+    sf === 0 &&
+    final === 0 &&
+    winner === 0
+  ) {
+    return `<span class="round-badge out">OUT</span>`;
   }
 
-  if (win >= 35) return 'WIN';
-  if (final >= 35) return 'FINAL';
-  if (sf >= 35) return 'SF';
-  if (qf >= 35) return 'QF';
-  if (r16 >= 35) return 'R16';
+  if (winner >= 35)
+    return `<span class="round-badge champ">🏆</span>`;
 
-  return 'R32';
+  if (final >= 35)
+    return `<span class="round-badge final">F</span>`;
+
+  if (sf >= 35)
+    return `<span class="round-badge sf">SF</span>`;
+
+  if (qf >= 35)
+    return `<span class="round-badge qf">QF</span>`;
+
+  return `<span class="round-badge r16">R16</span>`;
 }
 
 function renderGroupCards(rows) {
