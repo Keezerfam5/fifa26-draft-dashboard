@@ -1175,36 +1175,64 @@ function isValidKnockoutDisplayTeam(team, stage, context = {}) {
   return true;
 }
 
-function resolveBracketTeam(name, context) {
+function resolveBracketTeam(name, context = {}) {
   const raw = String(name || '').trim();
   const lower = raw.toLowerCase();
 
-const knockoutMatch = lower.match(/round of 32 (\d+) winner/);
-if (knockoutMatch) {
-  return readableWinnerPlaceholder(raw, context);
+  const match = lower.match(/(round of 32|round of 16|quarterfinal|semifinal)\s+(\d+)\s+(winner|loser)/i);
+  if (!match) return raw;
+
+  const roundName = match[1].toLowerCase();
+  const matchNumber = Number(match[2]);
+  const resultType = match[3].toLowerCase();
+
+  const roundGames = getBracketRoundGames(roundName);
+  const sourceGame = roundGames[matchNumber - 1];
+
+  if (!sourceGame) return raw;
+
+  if (isCompleted(sourceGame)) {
+    const resolved = resultType === 'loser'
+      ? getLoser(sourceGame)
+      : getWinner(sourceGame);
+
+    return resolved || readableMatchPlaceholder(sourceGame, resultType);
+  }
+
+  return readableMatchPlaceholder(sourceGame, resultType);
 }
 
-  const r16Match = lower.match(/round of 16 (\d+) winner/);
-  if (r16Match) {
-    return context.r16Winners?.[Number(r16Match[1]) - 1] || raw;
-  }
+function getBracketRoundGames(roundName) {
+  const stageMap = {
+    'round of 32': 'Round of 32',
+    'round of 16': 'Round of 16',
+    'quarterfinal': 'Quarterfinal',
+    'semifinal': 'Semifinal'
+  };
 
-  const qfMatch = lower.match(/quarterfinal (\d+) winner/);
-  if (qfMatch) {
-    return context.qfWinners?.[Number(qfMatch[1]) - 1] || raw;
-  }
+  const stage = stageMap[roundName];
+  if (!stage) return [];
 
-  const sfWinnerMatch = lower.match(/semifinal (\d+) winner/);
-  if (sfWinnerMatch) {
-    return context.sfWinners?.[Number(sfWinnerMatch[1]) - 1] || raw;
-  }
+  return (dashboardData?.games || [])
+    .filter(g => g.Stage === stage)
+    .filter(g => g['Team 1'] && g['Team 2'])
+    .sort((a, b) => new Date(a.Date) - new Date(b.Date));
+}
 
-  const sfLoserMatch = lower.match(/semifinal (\d+) loser/);
-  if (sfLoserMatch) {
-    return context.sfLosers?.[Number(sfLoserMatch[1]) - 1] || raw;
-  }
+function readableMatchPlaceholder(game, resultType = 'winner') {
+  const label = resultType === 'loser' ? 'Loser' : 'Winner';
 
-  return raw;
+  const team1 = resolveBracketTeam(game['Team 1']);
+  const team2 = resolveBracketTeam(game['Team 2']);
+
+  return `${label}: ${stripPlaceholderPrefix(team1)} / ${stripPlaceholderPrefix(team2)}`;
+}
+
+function stripPlaceholderPrefix(value) {
+  return String(value || '')
+    .replace(/^Winner:\s*/i, '')
+    .replace(/^Loser:\s*/i, '')
+    .trim();
 }
 
 function readableWinnerPlaceholder(raw, context = {}) {
