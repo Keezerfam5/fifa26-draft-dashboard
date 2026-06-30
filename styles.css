@@ -1165,3 +1165,43 @@ th {
   grid-template-columns: minmax(0, 1fr) 34px 46px 48px !important;
   gap: 6px !important;
 }
+
+.round-badge{
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+
+  min-width:40px;
+  padding:3px 6px;
+
+  border-radius:999px;
+
+  font-size:10px;
+  font-weight:800;
+  color:white;
+}
+
+.round-badge.out{
+  background:#dc2626;
+}
+
+.round-badge.r16{
+  background:#f97316;
+}
+
+.round-badge.qf{
+  background:#eab308;
+  color:#111827;
+}
+
+.round-badge.sf{
+  background:#2563eb;
+}
+
+.round-badge.final{
+  background:#7c3aed;
+}
+
+.round-badge.champ{
+  background:#16a34a;
+}
