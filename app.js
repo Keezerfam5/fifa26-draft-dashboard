@@ -986,7 +986,9 @@ function renderKnockoutBracket(games) {
     .filter(g => g['Team 1'] && g['Team 2'])
     .sort((a, b) => new Date(a.Date) - new Date(b.Date));
 
-  const r32 = knockoutGames.filter(g => g.Stage === 'Round of 32');
+ const r32 = knockoutGames
+  .filter(g => g.Stage === 'Round of 32')
+  .sort((a, b) => round32BracketIndex(a) - round32BracketIndex(b));
   const r16 = knockoutGames.filter(g => g.Stage === 'Round of 16');
   const qf = knockoutGames.filter(g => g.Stage === 'Quarterfinal');
   const sf = knockoutGames.filter(g => g.Stage === 'Semifinal');
@@ -1213,10 +1215,54 @@ function getBracketRoundGames(roundName) {
   const stage = stageMap[roundName];
   if (!stage) return [];
 
-  return (dashboardData?.games || [])
-    .filter(g => g.Stage === stage)
-    .filter(g => g['Team 1'] && g['Team 2'])
-    .sort((a, b) => new Date(a.Date) - new Date(b.Date));
+ const roundGames = (dashboardData?.games || [])
+  .filter(g => g.Stage === stage)
+  .filter(g => g['Team 1'] && g['Team 2']);
+
+if (stage === 'Round of 32') {
+  return roundGames.sort((a, b) => round32BracketIndex(a) - round32BracketIndex(b));
+}
+
+return roundGames.sort((a, b) => new Date(a.Date) - new Date(b.Date));
+}
+
+function round32BracketIndex(g) {
+  const pairs = [
+    ['Canada', 'South Africa'],
+    ['Netherlands', 'Morocco'],
+    ['Paraguay', 'Germany'],
+    ['France', 'Sweden'],
+
+    ['Brazil', 'Japan'],
+    ['Ivory Coast', 'Norway'],
+    ['Mexico', 'Ecuador'],
+    ['England', 'Congo'],
+
+    ['Portugal', 'Croatia'],
+    ['Spain', 'Austria'],
+    ['United States', 'Bosnia'],
+    ['Belgium', 'Senegal'],
+
+    ['Argentina', 'Cape Verde'],
+    ['Australia', 'Egypt'],
+    ['Switzerland', 'Algeria'],
+    ['Colombia', 'Ghana']
+  ];
+
+  const t1 = normalizeTeamName(g['Team 1']);
+  const t2 = normalizeTeamName(g['Team 2']);
+
+  const idx = pairs.findIndex(pair => {
+    const a = normalizeTeamName(pair[0]);
+    const b = normalizeTeamName(pair[1]);
+
+    return (
+      (t1 === a && t2 === b) ||
+      (t1 === b && t2 === a)
+    );
+  });
+
+  return idx === -1 ? 999 : idx;
 }
 
 function readableMatchPlaceholder(game, resultType = 'winner') {
