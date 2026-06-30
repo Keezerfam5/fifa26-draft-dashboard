@@ -1181,7 +1181,7 @@ function resolveBracketTeam(name, context) {
 
 const knockoutMatch = lower.match(/round of 32 (\d+) winner/);
 if (knockoutMatch) {
-  return raw;
+  return readableWinnerPlaceholder(raw, context);
 }
 
   const r16Match = lower.match(/round of 16 (\d+) winner/);
@@ -1205,6 +1205,20 @@ if (knockoutMatch) {
   }
 
   return raw;
+}
+
+function readableWinnerPlaceholder(raw, context = {}) {
+  const matchNum = String(raw).match(/round of 32 (\d+) winner/i)?.[1];
+  if (!matchNum) return raw;
+
+  const r32Games = (dashboardData?.games || [])
+    .filter(g => g.Stage === 'Round of 32')
+    .sort((a, b) => new Date(a.Date) - new Date(b.Date));
+
+  const game = r32Games[Number(matchNum) - 1];
+  if (!game) return raw;
+
+  return `Winner: ${game['Team 1']} / ${game['Team 2']}`;
 }
 
 function getWinner(g) {
