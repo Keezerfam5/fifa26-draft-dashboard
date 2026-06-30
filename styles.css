@@ -1074,46 +1074,39 @@ th {
 .owner-team-header,
 .owner-card li.owner-team-row {
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) 34px 46px 58px !important;
+  grid-template-columns: minmax(0, 1fr) 36px 42px 62px !important;
   gap: 6px !important;
   align-items: center !important;
 }
 
-.owner-team-header {
-  margin-top: 10px;
-  padding-bottom: 4px;
-  font-size: 11px;
-  font-weight: 900;
-  color: #6b7280;
-  text-transform: uppercase;
+.owner-team-header span,
+.owner-team-row strong,
+.round-badge {
+  text-align: center !important;
+  justify-self: center !important;
 }
 
 .owner-team-row span:first-child {
+  justify-self: start !important;
   min-width: 0 !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
 }
 
-.owner-team-header span:nth-child(2),
-.owner-team-header span:nth-child(3),
-.owner-team-header span:nth-child(4),
-.owner-team-row strong {
-  text-align: right !important;
-}
-
 .round-badge {
-  justify-self: end;
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  min-width: 52px;
-  padding: 3px 6px;
+  width: 58px;
+  height: 24px;
+  padding: 0 5px;
   border-radius: 999px;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 900;
   color: white;
   white-space: nowrap;
+  line-height: 1;
 }
 
 .round-badge.out { background: #dc2626; }
