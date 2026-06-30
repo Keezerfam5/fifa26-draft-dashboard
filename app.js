@@ -184,7 +184,7 @@ function renderTicker(games) {
   onclick="openMatchModal(dashboardData.games[${games.indexOf(g)}])"
 >
           <div class="ticker-top">
-<span>${tickerPrimaryStatus(g)}</span>
+<span>${tickerPrimaryStatus(g)}${tickerWinnerText(g)}</span>
             <span class="ticker-tv">${g.Clock || g.Status || ''}</span>
           </div>
 
@@ -626,6 +626,15 @@ function tickerPrimaryStatus(g) {
   if (hasStarted) return status || 'Live';
 
   return formatShortTime(g.Date);
+}
+
+function tickerWinnerText(g) {
+  if (!isCompleted(g)) return '';
+
+  const winner = getWinner(g);
+  if (!winner) return '';
+
+  return ` • ${winner} adv.`;
 }
 
 function calculateTitleProbabilities(rows) {
