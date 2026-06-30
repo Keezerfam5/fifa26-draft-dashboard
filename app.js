@@ -918,15 +918,14 @@ function renderOwnerCards(rows, teams) {
 
 <ul>
   ${ownerTeams.map(t => `
-    <li class="owner-team-row">
-      <span class="team-link" onclick="openTeamModal('${t.Team}')">
-        ${flag(t.Team)} ${t.Team}
-      </span>
-      <strong>${t['Total Pts'] || 0}</strong>
-      <strong>${Math.round(Number(t.SimExpectedPts || t['Total Pts'] || 0))}</strong>
-<strong>${Math.round(Number(t.SimExpectedPts || t['Total Pts'] || 0))}</strong>
-<strong>${likelyRound(t)}</strong>
-    </li>
+   <li class="owner-team-row">
+  <span class="team-link" onclick="openTeamModal('${t.Team}')">
+    ${flag(t.Team)} ${t.Team}
+  </span>
+  <strong>${t['Total Pts'] || 0}</strong>
+  <strong>${Math.round(Number(t.SimExpectedPts || t['Total Pts'] || 0))}</strong>
+  ${likelyRound(t)}
+</li>
   `).join('')}
 </ul>       
           </div>
@@ -937,8 +936,8 @@ function renderOwnerCards(rows, teams) {
 }
 
 function likelyRound(t) {
-
   const current = Number(t['Total Pts'] || 0);
+  const projected = Number(t.SimExpectedPts || current);
 
   const r16 = Number(t.SimR16 || 0);
   const qf = Number(t.SimQF || 0);
@@ -946,30 +945,17 @@ function likelyRound(t) {
   const final = Number(t.SimFinal || 0);
   const winner = Number(t.SimWinner || 0);
 
-  if (
-    current === 0 &&
-    r16 === 0 &&
-    qf === 0 &&
-    sf === 0 &&
-    final === 0 &&
-    winner === 0
-  ) {
+  if (projected <= current && qf === 0 && sf === 0 && final === 0 && winner === 0) {
     return `<span class="round-badge out">OUT</span>`;
   }
 
-  if (winner >= 35)
-    return `<span class="round-badge champ">🏆</span>`;
+  if (winner >= 10) return `<span class="round-badge champ">🏆 ${winner}%</span>`;
+  if (final >= 20) return `<span class="round-badge final">F ${final}%</span>`;
+  if (sf >= 25) return `<span class="round-badge sf">SF ${sf}%</span>`;
+  if (qf >= 25) return `<span class="round-badge qf">QF ${qf}%</span>`;
+  if (r16 > 0) return `<span class="round-badge r16">R16 ${r16}%</span>`;
 
-  if (final >= 35)
-    return `<span class="round-badge final">F</span>`;
-
-  if (sf >= 35)
-    return `<span class="round-badge sf">SF</span>`;
-
-  if (qf >= 35)
-    return `<span class="round-badge qf">QF</span>`;
-
-  return `<span class="round-badge r16">R16</span>`;
+  return `<span class="round-badge out">OUT</span>`;
 }
 
 function renderGroupCards(rows) {
