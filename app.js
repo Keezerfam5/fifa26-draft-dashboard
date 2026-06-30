@@ -648,7 +648,9 @@ function tickerPrimaryStatus(g) {
     status.toLowerCase().includes('progress') ||
     status.toLowerCase().includes('halftime');
 
-  if (hasStarted) return status || 'Live';
+  if (hasStarted && !status.toLowerCase().includes('scheduled')) {
+    return status || 'Live';
+  }
 
   return `${status || 'Scheduled'} • ${formatShortTime(g.Date)}`;
 }
