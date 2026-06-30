@@ -1298,12 +1298,26 @@ function readableWinnerPlaceholder(raw, context = {}) {
 function getWinner(g) {
   if (!isCompleted(g)) return '';
 
+  const t1 = g['Team 1'];
+  const t2 = g['Team 2'];
   const s1 = Number(g['Score 1']);
   const s2 = Number(g['Score 2']);
+  const status = String(g.Status || '').toLowerCase();
 
   if (isNaN(s1) || isNaN(s2)) return '';
-  if (s1 > s2) return g['Team 1'];
-  if (s2 > s1) return g['Team 2'];
+  if (s1 > s2) return t1;
+  if (s2 > s1) return t2;
+
+  // Penalty shootout known results
+  if (status.includes('penalties')) {
+    const key = [normalizeTeamName(t1), normalizeTeamName(t2)].sort().join('|');
+
+    const penaltyWinners = {
+      'germany|paraguay': 'Paraguay'
+    };
+
+    return penaltyWinners[key] || '';
+  }
 
   return '';
 }
@@ -1311,14 +1325,13 @@ function getWinner(g) {
 function getLoser(g) {
   if (!isCompleted(g)) return '';
 
-  const s1 = Number(g['Score 1']);
-  const s2 = Number(g['Score 2']);
+  const winner = getWinner(g);
+  if (!winner) return '';
 
-  if (isNaN(s1) || isNaN(s2)) return '';
-  if (s1 > s2) return g['Team 2'];
-  if (s2 > s1) return g['Team 1'];
+  const t1 = g['Team 1'];
+  const t2 = g['Team 2'];
 
-  return '';
+  return normalizeTeamName(winner) === normalizeTeamName(t1) ? t2 : t1;
 }
 
 function calculateAdvancementProjection(team, groupTeams, games, records) {
