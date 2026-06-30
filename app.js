@@ -989,7 +989,9 @@ function renderKnockoutBracket(games) {
  const r32 = knockoutGames
   .filter(g => g.Stage === 'Round of 32')
   .sort((a, b) => round32BracketIndex(a) - round32BracketIndex(b));
-  const r16 = knockoutGames.filter(g => g.Stage === 'Round of 16');
+const rawR16 = knockoutGames.filter(g => g.Stage === 'Round of 16');
+
+const r16 = buildFixedRoundOf16Games(r32, rawR16);
   const qf = knockoutGames.filter(g => g.Stage === 'Quarterfinal');
   const sf = knockoutGames.filter(g => g.Stage === 'Semifinal');
   const third = knockoutGames.filter(g => g.Stage === 'Third Place');
@@ -1045,6 +1047,49 @@ ${bracketColumn('Round of 32', r32.slice(8, 16), context)}
   }
 
   document.getElementById('bracket').innerHTML = html;
+}
+
+function buildFixedRoundOf16Games(r32, rawR16) {
+  const r16Dates = rawR16.map(g => g.Date).sort((a, b) => new Date(a) - new Date(b));
+
+  const pairings = [
+    [0, 1],   // Canada/South Africa vs Netherlands/Morocco
+    [2, 3],   // Paraguay/Germany vs France/Sweden
+    [4, 5],   // Brazil/Japan vs Ivory Coast/Norway
+    [6, 7],   // Mexico/Ecuador vs England/Congo
+
+    [8, 9],   // Portugal/Croatia vs Spain/Austria
+    [10, 11], // United States/Bosnia vs Belgium/Senegal
+    [12, 13], // Argentina/Cape Verde vs Australia/Egypt
+    [14, 15]  // Switzerland/Algeria vs Colombia/Ghana
+  ];
+
+  return pairings.map((pair, i) => {
+    const leftGame = r32[pair[0]];
+    const rightGame = r32[pair[1]];
+    const existing = rawR16[i] || {};
+
+    return {
+      ...existing,
+      Stage: 'Round of 16',
+      Date: existing.Date || r16Dates[i] || '',
+      Status: existing.Status || 'Scheduled',
+      'Score 1': existing['Score 1'] || 0,
+      'Score 2': existing['Score 2'] || 0,
+      'Team 1': resolvedOrPlaceholder(leftGame),
+      'Team 2': resolvedOrPlaceholder(rightGame)
+    };
+  });
+}
+
+function resolvedOrPlaceholder(game) {
+  if (!game) return 'TBD';
+
+  if (isCompleted(game)) {
+    return getWinner(game) || readableMatchPlaceholder(game, 'winner');
+  }
+
+  return readableMatchPlaceholder(game, 'winner');
 }
 
 function bracketGame(g, context = {}) {
