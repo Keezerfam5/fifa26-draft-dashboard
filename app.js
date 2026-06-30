@@ -912,7 +912,8 @@ function renderOwnerCards(rows, teams) {
 <div class="owner-team-header">
   <span>Team</span>
   <span>Cur</span>
-  <span>Proj</span>
+<span>Proj</span>
+<span>Likely</span>
 </div>
 
 <ul>
@@ -922,7 +923,8 @@ function renderOwnerCards(rows, teams) {
         ${flag(t.Team)} ${t.Team}
       </span>
       <strong>${t['Total Pts'] || 0}</strong>
-      <strong>${t.SimExpectedPts || t['Total Pts'] || 0}</strong>
+      <strong>${Math.round(Number(t.SimExpectedPts || t['Total Pts'] || 0))}</strong>
+<strong>${likelyRound(t)}</strong>
     </li>
   `).join('')}
 </ul>       
@@ -931,6 +933,28 @@ function renderOwnerCards(rows, teams) {
       }).join('')}
     </div>
   `;
+}
+
+function likelyRound(t) {
+  const current = Number(t['Total Pts'] || 0);
+
+  const r16 = Number(t.SimR16 || 0);
+  const qf = Number(t.SimQF || 0);
+  const sf = Number(t.SimSF || 0);
+  const final = Number(t.SimFinal || 0);
+  const win = Number(t.SimWinner || 0);
+
+  if (current === 0 && r16 === 0 && qf === 0 && sf === 0 && final === 0 && win === 0) {
+    return 'ELIM';
+  }
+
+  if (win >= 35) return 'WIN';
+  if (final >= 35) return 'FINAL';
+  if (sf >= 35) return 'SF';
+  if (qf >= 35) return 'QF';
+  if (r16 >= 35) return 'R16';
+
+  return 'R32';
 }
 
 function renderGroupCards(rows) {
