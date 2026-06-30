@@ -1073,7 +1073,7 @@ th {
 .owner-team-header,
 .owner-team-row {
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) 44px 58px;
+  grid-template-columns: minmax(0, 1fr) 34px 46px 48px;
   gap: 6px;
   align-items: center;
   width: 100%;
@@ -1142,7 +1142,7 @@ th {
 }
 .owner-card li.owner-team-row {
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) 38px 54px !important;
+  grid-template-columns: minmax(0, 1fr) 34px 46px 48px !important;
   gap: 6px !important;
   justify-content: normal !important;
   align-items: center !important;
@@ -1162,6 +1162,6 @@ th {
 
 .owner-team-header {
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) 38px 54px !important;
+  grid-template-columns: minmax(0, 1fr) 34px 46px 48px !important;
   gap: 6px !important;
 }
